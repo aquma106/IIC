@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>IIC UIT Shimla | Innovation Portal</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@500&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:#020617;
+color:white;
+overflow-x:hidden;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar{
+position:fixed;
+top:15px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:12px 35px;
+background:rgba(0,0,0,0.75);
+backdrop-filter:blur(12px);
+border-radius:50px;
+z-index:1000;
+box-shadow:0 10px 40px rgba(0,0,0,0.5);
+}
+
+/* ================= LOGOS ================= */
+
+.logo-group{
+display:flex;
+align-items:center;
+gap:18px;
+}
+
+.logo-group img{
+width:85px;
+height:85px;
+border-radius:50%;
+object-fit:contain;
+background:white;
+padding:6px;
+transition:0.4s;
+}
+
+.logo-group img:hover{
+transform:scale(1.15) rotate(3deg);
+box-shadow:0 0 15px #38bdf8;
+}
+
+/* ================= NAV LINKS ================= */
+
+nav{
+display:flex;
+gap:25px;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+font-weight:600;
+position:relative;
+transition:0.3s;
+}
+
+nav a:hover{
+color:#38bdf8;
+}
+
+nav a::after{
+content:"";
+display:block;
+width:0%;
+height:2px;
+background:#38bdf8;
+transition:0.3s;
+}
+
+nav a:hover::after{
+width:100%;
+}
+
+/* ================= HERO ================= */
+
+#ai-bg{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+}
+
+.hero{
+position:relative;
+height:100vh;
+
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+overflow:hidden;
+}
+.hero h1{
+font-family:'Orbitron', sans-serif;
+}
+
+
+.hero-content{
+z-index:2;
+}
+
+#ai-bg{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+}
+
+.hero h1{
+font-size:60px;
+letter-spacing:3px;
+}
+.hero p{
+    font-size:40px;
+}
+/* ================= SECTIONS ================= */
+
+.section{
+padding:100px 10%;
+text-align:center;
+}
+
+/* ================= DASHBOARD ================= */
+
+.dashboard{
+display:flex;
+justify-content:center;
+gap:70px;
+flex-wrap:wrap;
+margin-top:40px;
+}
+
+.counter{
+font-size:48px;
+color:#22c55e;
+font-weight:bold;
+}
+
+/* ================= TEAM GRID ================= */
+
+.team-grid{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:30px;
+margin-top:40px;
+margin-bottom:60px;   /* ADD THIS */
+}
+
+.section h2{
+margin-top:60px;
+margin-bottom:30px;
+}
+.team-grid{
+width:100%;
+clear:both;
+}
+/* ================================
+   FACULTY LEADERSHIP SECTION
+================================ */
+
+#faculty{
+padding-top:120px;
+}
+
+.faculty-leadership{
+display:flex;
+justify-content:center;
+align-items:center;
+margin-top:40px;
+margin-bottom:60px;
+}
+
+
+/* ================================
+   PRESIDENT CARD
+================================ */
+
+.president-card{
+
+position:relative;
+
+width:300px;
+
+padding:35px 25px;
+
+margin:0 auto;
+
+background:rgba(255,255,255,0.08);
+
+backdrop-filter:blur(14px);
+
+border-radius:22px;
+
+border:1px solid rgba(255,255,255,0.2);
+
+box-shadow:0 0 25px rgba(56,189,248,0.35);
+
+text-align:center;
+
+transition:0.4s ease;
+
+overflow:hidden;
+
+}
+
+
+/* HOVER */
+
+.president-card:hover{
+
+transform:translateY(-12px) scale(1.05);
+
+box-shadow:0 0 45px #38bdf8;
+
+}
+
+
+/* GLOW BORDER */
+
+.president-card::before{
+
+content:"";
+
+position:absolute;
+
+inset:-2px;
+
+border-radius:22px;
+
+background:linear-gradient(45deg,#38bdf8,#6366f1,#22c55e,#38bdf8);
+
+filter:blur(20px);
+
+opacity:0;
+
+z-index:-1;
+
+transition:0.4s;
+
+}
+
+.president-card:hover::before{
+opacity:1;
+}
+
+
+/* IMAGE */
+
+.president-card img{
+
+width:140px;
+
+height:140px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+border:4px solid #38bdf8;
+
+box-shadow:0 0 18px #38bdf8;
+
+margin-bottom:18px;
+
+transition:0.4s;
+
+}
+
+.president-card:hover img{
+
+transform:scale(1.08);
+
+box-shadow:0 0 30px #38bdf8;
+
+}
+
+
+/* TEXT */
+
+.president-card h3{
+font-size:20px;
+font-weight:600;
+margin-bottom:6px;
+}
+
+.president-card p{
+font-size:15px;
+color:#cbd5f5;
+letter-spacing:0.5px;
+}
+/* ================= TEAM BUTTONS ================= */
+
+.team-buttons{
+margin-top:40px;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:15px;
+}
+
+.team-buttons button{
+font-family:'Montserrat', sans-serif !important;
+padding:12px 25px;
+
+border:none;
+
+border-radius:25px;
+
+background:#1e293b;
+
+color:white;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:0.4s;
+
+box-shadow:0 5px 20px rgba(0,0,0,0.4);
+
+}
+
+.team-buttons button:hover{
+
+background:#38bdf8;
+
+color:black;
+
+transform:scale(1.07);
+
+box-shadow:0 0 20px #38bdf8;
+
+}
+
+/* ================= TEAM DISPLAY ================= */
+
+#team-display{
+
+margin-top:40px;
+font-family: 'Montserrat', sans-serif;
+animation:fadeIn 0.6s ease;
+
+}
+
+@keyframes fadeIn{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+/* 3D FLIP CARD */
+
+.flip-card{
+width:260px;
+height:320px;
+perspective:1000px;
+}
+
+
+.flip-inner{
+position:relative;
+width:100%;
+height:100%;
+transition:transform 0.8s;
+transform-style:preserve-3d;
+}
+
+.flip-card:hover .flip-inner{
+transform:rotateY(180deg);
+}
+
+.flip-front,
+.flip-back{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+border-radius:20px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+padding:25px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+}
+
+.flip-back{
+transform:rotateY(180deg);
+}
+
+.flip-front img{
+width:130px;
+height:130px;
+border-radius:50%;
+object-fit:cover;
+border:4px solid #38bdf8;
+margin-bottom:15px;
+}
+/* ================= PRESIDENT SPECIAL ================= */
+
+.president .flip-card{
+
+width:260px;
+height:330px;
+
+}
+
+.president .flip-card::before{
+
+background:linear-gradient(
+60deg,
+gold,
+orange,
+gold
+);
+
+animation:presGlow 3s linear infinite;
+
+opacity:1;
+
+}
+
+@keyframes presGlow{
+
+0%{filter:hue-rotate(0deg);}
+100%{filter:hue-rotate(360deg);}
+
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+
+display:none;
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,0.85);
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+.modal-content{
+
+background:white;
+
+color:black;
+
+padding:30px;
+
+border-radius:10px;
+
+text-align:center;
+
+width:320px;
+
+}
+
+/* ================= FOOTER ================= */
+
+.footer{
+
+background:#020617;
+
+padding:25px;
+
+text-align:center;
+
+font-size:14px;
+
+color:#cbd5f5;
+
+border-top:1px solid rgba(255,255,255,0.1);
+
+margin-top:80px;
+
+}
+
+.footer a{
+
+color:#38bdf8;
+
+text-decoration:none;
+
+}
+
+.footer a:hover{
+
+text-decoration:underline;
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<header class="navbar">
+
+<div class="logo-group">
+
+<img src="../static/images/logo.jpg">
+<img src="../static/images/logo2.jpg">
+<img src="../static/images/logo3.png">
+<img src="../static/images/logo4.png">
+<img src="../static/images/logo7.jpg">
+
+</div>
+
+
+<nav>
+<a href="#">Home</a>
+<a href="#faculty">faculty</a>
+<a href="#teams">Teams</a>
+<a href="#faculty-login">Faculty-Login</a>
+<a href="#">Student-Coordinator-Login</a>
+<a href="#">Events</a>
+</nav>
+</header>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+<div id="ai-bg"></div>
+
+<div class="hero-content">
+<h1>Institution's Innovation Council</h1>
+<p>University Institute of Technology Shimla</p>
+</div>
+
+</section>
+
+<!-- DASHBOARD -->
+
+<section class="section">
+
+<h2>Innovation Dashboard</h2>
+
+<div class="dashboard">
+
+<div>
+<h2 class="counter" data-target="120">0</h2>
+<p>Projects</p>
+</div>
+
+<div>
+<h2 class="counter" data-target="40">0</h2>
+<p>Events</p>
+</div>
+
+<div>
+<h2 class="counter" data-target="15">0</h2>
+<p>Startups</p>
+</div>
+
+</div>
+</section>
+
+<section id="faculty" class="section">
+
+<h2>IIC Faculty Leadership</h2>
+
+<!-- PRESIDENT -->
+
+<div class="faculty-leadership">
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/president.jpg">
+<h3>Dr. Kapil Bhatt</h3>
+<p>IIC President & IPR Cell Coordinator</p>
+</div>
+
+<div class="flip-back">
+<h3>Dr. Kapil Bhatt</h3>
+<p>Electronics & Communication Engineering</p>
+<p>IPR Cell Coordinator</p>
+</div>
+
+</div>
+</div>
+
+</div>
+
+
+<!-- VICE PRESIDENT -->
+
+<h2>Vice President</h2>
+
+<div class="team-grid">
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/vp.jpg">
+<h3>Dr. Rajesh Chauhan</h3>
+<p>Vice President</p>
+</div>
+
+<div class="flip-back">
+<h3>Dr. Rajesh Chauhan</h3>
+<p>Vice President</p>
+</div>
+
+</div>
+</div>
+
+</div>
+
+
+<!-- FACULTY COORDINATORS -->
+
+<h2>Faculty Coordinators</h2>
+
+<div class="team-grid">
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/faculty1.jpg">
+<h3>Er. Sunil Kumar</h3>
+<p>Convenyer</p>
+</div>
+<div class="flip-back">
+<p>Convenyer</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/faculty2.jpeg">
+<h3>Dr. Neeru Sharma</h3>
+<p>NIRF Coordinator</p>
+</div>
+<div class="flip-back">
+<p>NIRF Coordinator</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/faculty3.jpeg">
+<h3>Dr. Richa Chandel</h3>
+<p>ARIIA Coordinator</p>
+</div>
+<div class="flip-back">
+<p>Dr. Richa Chandel</p>
+<p></p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/faculty4.jpeg">
+<h3>Er. Harish Chand</h3>
+<p>Internship Coordinator</p>
+</div>
+<div class="flip-back">
+<p>Internship Coordinator</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/faculty5.jpeg">
+<h3>Dr. Anjali Sharma</h3>
+<p>Entrepreneurship Coordinator</p>
+</div>
+<div class="flip-back">
+<p>Entrepreneurship Coordinator</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="images/faculty6.jpg">
+<h3>Dr</h3>
+<p>Social Media Coordinator</p>
+</div>
+<div class="flip-back">
+<p>Social Media Coordinator</p>
+</div>
+</div>
+</div>
+
+</div>
+
+</section>
+<section id="teams" class="section">
+
+<h2>IIC Teams</h2>
+
+<div class="team-buttons">
+
+<button onclick="showTeam('Student-President')">Student President</button>
+
+<button onclick="showTeam('Intellectual Property Rights')">IPR Team</button>
+
+<button onclick="showTeam('ARIIA')">ARIIA Team</button>
+
+<button onclick="showTeam('startup')">Startup Team</button>
+
+<button onclick="showTeam('Internship')">Internship Team</button>
+
+<button onclick="showTeam('Innovation')">Innovation Team</button>
+
+<button onclick="showTeam('Enterpreneurship')">Enterpreneurship Team</button>
+
+<button onclick="showTeam('NIRF')">NIRF & Student Convener Team</button>
+
+<button onclick="showTeam('Social Media')">Social Media Team</button>
+
+</div>
+
+<div id="team-display"></div>
+
+</section>
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+<p>© <span id="year"></span> Institution's Innovation Council, UIT Shimla. All Rights Reserved.</p>
+
+<p>
+For Technical Assistance contact:
+<a href="mailto:AradhyaKaul540@gmail.com">AradhyaKaul540@gmail.com</a>
+</p>
+
+</footer>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+
+
+
+<!-- PROFILE MODAL -->
+
+<div id="profileModal" class="modal">
+
+<div class="modal-content">
+
+<h2 id="name"></h2>
+<p id="role"></p>
+<p id="dept"></p>
+
+<button onclick="closeProfile()">Close</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ================================
+   YEAR AUTO UPDATE
+================================ */
+
+document.getElementById("year").textContent = new Date().getFullYear();
+
+
+
+/* ================================
+   INNOVATION COUNTER ANIMATION
+================================ */
+
+const counters = document.querySelectorAll('.counter');
+
+counters.forEach(counter => {
+
+function updateCounter(){
+
+const target = +counter.getAttribute("data-target");
+const count = +counter.innerText;
+
+const increment = target / 40;
+
+if(count < target){
+
+counter.innerText = Math.ceil(count + increment);
+
+setTimeout(updateCounter,40);
+
+}else{
+
+counter.innerText = target;
+
+}
+
+}
+
+updateCounter();
+
+});
+
+
+
+/* ================================
+   PROFILE MODAL SYSTEM
+================================ */
+
+function openProfile(name, role, dept){
+
+const modal = document.getElementById("profileModal");
+
+modal.style.display = "flex";
+
+document.getElementById("name").innerText = name;
+
+document.getElementById("role").innerText = "Role: " + role;
+
+document.getElementById("dept").innerText = "Department: " + dept;
+
+}
+
+
+function closeProfile(){
+
+document.getElementById("profileModal").style.display = "none";
+
+}
+
+
+
+/* ================================
+   TEAM FILTER SYSTEM
+================================ */
+
+
+
+function showTeam(team){
+
+let html = "";
+
+/* ================================
+   PRESIDENT
+================================ */
+
+if(team === "Student-President"){
+
+html = `
+
+<h3>IIC Leadership</h3>
+
+<div class="faculty-leadership">
+
+<div class="flip-card">
+
+<div class="flip-inner">
+
+<div class="flip-front">
+
+<img src="../static/images/">
+
+<h3>Devansh Sharma</h3>
+
+<p>Student-President (IIC)</p>
+
+</div>
+
+<div class="flip-back">
+
+<h3>Dr. ABC Sharma</h3>
+
+<p>Department: Computer Science</p>
+
+<p>Institution Innovation Council President</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}
+/* ================================
+   IPR TEAM
+================================ */
+
+if(team === "Intellectual Property Rights"){
+
+html = `
+
+<h3>IPR Team</h3>
+
+<div class="team-grid">
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/aradhya.jpg">
+<h3>Aradhya Kaul</h3>
+<p>IPR Student Coordinator</p>
+</div>
+<div class="flip-back">
+<p>Department:ECE</p>
+<p>IPR Lead</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/member.jpg">
+<h3>Rhydhum Sharma</h3>
+<p>IPR Member</p>
+</div>
+<div class="flip-back">
+<p>CSE</p>
+<p>IPR Team</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/agam.jpg">
+<h3>Agam Sharma</h3>
+<p>IPR Member</p>
+</div>
+<div class="flip-back">
+<p>Department: EE</p>
+<p>IPR Member</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/member3.jpg">
+<h3>Member 3</h3>
+<p>Team Member</p>
+</div>
+<div class="flip-back">
+<p>Department: ECE</p>
+<p>Documentation</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/member4.jpg">
+<h3>Member 4</h3>
+<p>Team Member</p>
+</div>
+<div class="flip-back">
+<p>Department: Mechanical</p>
+<p>Legal Research</p>
+</div>
+</div>
+</div>
+
+</div>
+`;
+
+}
+
+
+/* ================================
+   ARIIA TEAM
+================================ */
+
+if(team === "ARIIA"){
+
+html = `
+
+<h3>ARIIA Team</h3>
+
+<div class="team-grid">
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/aradhya.jpg">
+<h3>Aradhya Kaul</h3>
+<p>ARIIA Coordinator</p>
+</div>
+<div class="flip-back">
+<p>ARIIA Coordinator</p>
+<p>Department: ECE</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/Member1.jpg">
+<h3>Rudraksh Raina</h3><p>Team Member</p>
+</div><div class="flip-back"><p>ARIIA</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/pawan.jpeg">
+<h3>Pawandeep Kumar</h3><p>ARIIA Member</p>
+</div><div class="flip-back"><p>Report Preparation</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/harsh.jpg">
+<h3>Harsh Thakur</h3><p>ARIIA Member</p>
+</div><div class="flip-back"><p>ARIIA Member</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/khusboo.jpeg">
+<h3>Khushboo</h3><p>ARIIA Member</p>
+</div><div class="flip-back"><p>ARIIA</p></div></div></div>
+
+</div>
+`;
+
+}
+
+
+/* ================================
+   STARTUP TEAM
+================================ */
+
+if(team === "startup"){
+
+html = `
+
+<h3>Startup Team</h3>
+
+<div class="team-grid">
+
+<div class="flip-card">
+<div class="flip-inner">
+<div class="flip-front">
+<img src="../static/images/startup-coordinator.jpg">
+<h3>Startup Coordinator</h3>
+<p>Team Coordinator</p>
+</div>
+<div class="flip-back">
+<p>Startup Mentorship</p>
+<p>Department: MBA</p>
+</div>
+</div>
+</div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member1.jpg">
+<h3>Member 1</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Startup Support</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member2.jpg">
+<h3>Member 2</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Mentorship Programs</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member3.jpg">
+<h3>Member 3</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Startup Research</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member4.jpg">
+<h3>Member 4</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Funding Assistance</p></div></div></div>
+
+</div>
+`;
+
+}
+
+
+/* ================================
+   INTERNSHIP TEAM
+================================ */
+
+if(team === "Internship"){
+
+html = `
+
+<h3>Internship Team</h3>
+
+<div class="team-grid">
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/internship-coordinator.jpg">
+<h3>Internship Coordinator</h3>
+<p>Team Coordinator</p>
+</div><div class="flip-back">
+<p>Placement & Internship</p>
+</div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/nody.jpg">
+<h3>Saksham Sharma</h3><p>Internship Member</p>
+</div><div class="flip-back"><p>Internship Member</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member2.jpg">
+<h3>Member 2</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Company Outreach</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member3.jpg">
+<h3>Member 3</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Student Support</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member4.jpg">
+<h3>Member 4</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Internship Data</p></div></div></div>
+
+</div>
+`;
+
+}
+
+
+/* ================================
+   INNOVATION TEAM
+================================ */
+
+if(team === "Innovation"){
+
+html = `
+
+<h3>Innovation Team</h3>
+
+<div class="team-grid">
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/innovation-coordinator.jpg">
+<h3>Innovation Coordinator</h3>
+<p>Team Coordinator</p>
+</div><div class="flip-back">
+<p>Innovation Programs</p>
+</div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/pranav.jpg">
+<h3>Pranav Sharma</h3><p>Innovation Member</p>
+</div><div class="flip-back"><p>Innovation Member</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member2.jpg">
+<h3>Member 2</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Prototype Support</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member3.jpg">
+<h3>Member 3</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Research Programs</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member4.jpg">
+<h3>Member 4</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Innovation Workshops</p></div></div></div>
+
+</div>
+`;
+
+}
+
+
+/* ================================
+   ENTREPRENEURSHIP TEAM
+================================ */
+
+if(team === "Enterpreneurship"){
+
+html = `
+
+<h3>Entrepreneurship Team</h3>
+
+<div class="team-grid">
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/entrepreneur-coordinator.jpg">
+<h3>Entrepreneurship Coordinator</h3>
+<p>Team Coordinator</p>
+</div><div class="flip-back">
+<p>Startup Ecosystem</p>
+</div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member1.jpg">
+<h3>Member 1</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Business Strategy</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member2.jpg">
+<h3>Member 2</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Startup Events</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member3.jpg">
+<h3>Member 3</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Investor Connect</p></div></div></div>
+
+<div class="flip-card"><div class="flip-inner"><div class="flip-front">
+<img src="../static/images/member4.jpg">
+<h3>Member 4</h3><p>Team Member</p>
+</div><div class="flip-back"><p>Entrepreneur Mentorship</p></div></div></div>
+
+</div>
+`;
+
+}
+
+/* ================================
+   NIRF & STUDENT CONVENER TEAM
+================================ */
+
+if(team === "NIRF"){
+
+html = `
+
+<h3>NIRF & Student Convener Team</h3>
+
+<div class="team-grid">
+
+<!-- COORDINATOR -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/nirf-coordinator.jpg">
+<h3>NIRF Coordinator</h3>
+<p>Team Coordinator</p>
+</div>
+
+<div class="flip-back">
+<p>Data Collection Lead</p>
+<p>Ranking Documentation</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- STUDENT CONVENER -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/student-convener.jpg">
+<h3>Student Convener</h3>
+<p>IIC Representative</p>
+</div>
+
+<div class="flip-back">
+<p>Event Coordination</p>
+<p>Student Management</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- MEMBER 1 -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/member1.jpg">
+<h3>Member 1</h3>
+<p>Team Member</p>
+</div>
+
+<div class="flip-back">
+<p>Data Analysis</p>
+<p>NIRF Metrics</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- MEMBER 2 -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/member2.jpg">
+<h3>Member 2</h3>
+<p>Team Member</p>
+</div>
+
+<div class="flip-back">
+<p>Documentation</p>
+<p>Report Preparation</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- MEMBER 3 -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/member3.jpg">
+<h3>Member 3</h3>
+<p>Team Member</p>
+</div>
+
+<div class="flip-back">
+<p>Survey Data</p>
+<p>Research Metrics</p>
+</div>
+
+</div>
+</div>
+
+</div>
+
+`;
+}
+
+/* ================================
+   SOCIAL MEDIA TEAM
+================================ */
+
+if(team === "Social Media"){
+
+html = `
+
+<h3>Social Media Team</h3>
+
+<div class="team-grid">
+
+<!-- COORDINATOR -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/social-coordinator.jpg">
+<h3>Social Media Coordinator</h3>
+<p>Team Coordinator</p>
+</div>
+
+<div class="flip-back">
+<p>Content Strategy</p>
+<p>Digital Branding</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- MEMBER 1 -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/member1.jpg">
+<h3>Member 1</h3>
+<p>Content Creator</p>
+</div>
+
+<div class="flip-back">
+<p>Post Designing</p>
+<p>Creative Content</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- MEMBER 2 -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/member2.jpg">
+<h3>Member 2</h3>
+<p>Graphic Designer</p>
+</div>
+
+<div class="flip-back">
+<p>Poster & Banner Design</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- MEMBER 3 -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/member3.jpg">
+<h3>Member 3</h3>
+<p>Content Writer</p>
+</div>
+
+<div class="flip-back">
+<p>Caption Writing</p>
+<p>Social Campaigns</p>
+</div>
+
+</div>
+</div>
+
+
+<!-- MEMBER 4 -->
+
+<div class="flip-card">
+<div class="flip-inner">
+
+<div class="flip-front">
+<img src="../static/images/member4.jpg">
+<h3>Member 4</h3>
+<p>Digital Manager</p>
+</div>
+
+<div class="flip-back">
+<p>Account Management</p>
+<p>Analytics & Reach</p>
+</div>
+
+</div>
+</div>
+
+</div>
+
+`;
+
+}
+
+document.getElementById("team-display").innerHTML = html;
+}
+
+
+
+
+/* ================================
+   THREE JS AI PARTICLE BACKGROUND
+================================ */
+
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+);
+
+const renderer = new THREE.WebGLRenderer({
+alpha:true,
+antialias:true
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+document.getElementById("ai-bg").appendChild(renderer.domElement);
+
+
+
+/* PARTICLE SYSTEM */
+
+const geometry = new THREE.BufferGeometry();
+
+const vertices = [];
+
+for(let i=0;i<700;i++){
+
+vertices.push((Math.random()*2-1)*200);
+vertices.push((Math.random()*2-1)*200);
+vertices.push((Math.random()*2-1)*200);
+
+}
+
+geometry.setAttribute(
+'position',
+new THREE.Float32BufferAttribute(vertices,3)
+);
+
+
+
+const material = new THREE.PointsMaterial({
+
+color:0x38bdf8,
+size:2
+
+});
+
+
+
+const particles = new THREE.Points(geometry,material);
+
+scene.add(particles);
+
+
+camera.position.z = 150;
+
+
+
+/* ANIMATION LOOP */
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+particles.rotation.x += 0.0005;
+particles.rotation.y += 0.001;
+
+renderer.render(scene,camera);
+
+}
+
+animate();
+
+
+
+/* RESPONSIVE FIX */
+
+window.addEventListener("resize", () => {
+
+camera.aspect = window.innerWidth / window.innerHeight;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+});
+
+
+
+
+</script>
+</body>
+</html>

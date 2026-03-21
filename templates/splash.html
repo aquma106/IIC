@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>IIC UIT Shimla</title>
+
+<!-- FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+<!-- THREE JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+<style>
+
+/* ================= GLOBAL ================= */
+
+body{
+margin:0;
+height:100vh;
+background:#020617;
+color:white;
+font-family:'Poppins', sans-serif;
+overflow:hidden;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* ================= PARTICLE BG ================= */
+
+#bg{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+}
+
+/* ================= SPLASH ================= */
+
+.splash{
+text-align:center;
+animation:fadeIn 1.5s ease;
+
+}
+
+/* LOGO */
+
+.logo{
+width:130px;
+height:130px;
+border-radius:50%;
+background:white;
+padding:10px;
+margin-bottom:20px;
+animation:zoom 1.5s ease;
+}
+
+/* TITLE */
+
+h1{
+font-family:'Orbitron', sans-serif;
+font-size:34px;
+letter-spacing:3px;
+background: linear-gradient(90deg,#38bdf8,#22c55e);
+
+-webkit-background-clip: text; /* for Chrome/Safari */
+background-clip: text;         /* standard property */
+
+-webkit-text-fill-color: transparent;
+}
+
+/* TYPING TEXT */
+
+.typing{
+font-size:18px;
+color:#cbd5f5;
+margin-top:10px;
+min-height:25px;
+}
+
+/* LOADER BAR */
+
+.loader{
+width:220px;
+height:4px;
+background:rgba(255,255,255,0.1);
+margin:25px auto;
+border-radius:10px;
+overflow:hidden;
+}
+
+.loader-fill{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#38bdf8,#22c55e);
+animation:load 3s linear forwards;
+}
+
+/* ANIMATIONS */
+
+@keyframes load{
+0%{width:0;}
+100%{width:100%;}
+}
+
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+
+@keyframes zoom{
+from{transform:scale(0.5);}
+to{transform:scale(1);}
+}
+
+.fade-out{
+animation:fadeOut 1s forwards;
+}
+
+@keyframes fadeOut{
+to{opacity:0; visibility:hidden;}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- PARTICLE BG -->
+<div id="bg"></div>
+
+<!-- SPLASH CONTENT -->
+<div class="splash" id="splash">
+
+<img src="{{ url_for('static', filename='images/logo.jpg') }}" class="logo">
+
+<h1>IIC UIT SHIMLA</h1>
+
+<div class="typing" id="typing"></div>
+
+<div class="loader">
+<div class="loader-fill"></div>
+</div>
+
+<!-- ✅ ADD THIS EXACTLY HERE -->
+<p id="enterText" style="margin-top:15px; color:#94a3b8; cursor:pointer;">
+🔊 Tap to Enter UIT World
+</p>
+
+</div>
+
+<!-- AUDIO -->
+
+
+<audio id="welcomeAudio">
+  <source src="{{ url_for('static', filename='audio/download.mp3') }}" type="audio/mpeg">
+</audio>
+
+<script>
+
+/* ================= AUDIO ================= */
+
+const audio = document.getElementById("welcomeAudio");
+const splash = document.getElementById("splash");
+
+/* ================= TYPING ================= */
+
+const text = "Welcome to UIT World 🚀";
+let i = 0;
+
+function typingEffect(){
+    if(i < text.length){
+        document.getElementById("typing").innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typingEffect,50);
+    }
+}
+
+/* ================= START EXPERIENCE ================= */
+
+function startExperience(){
+
+    // play audio
+    audio.volume = 1;
+    audio.play();
+
+    // start typing AFTER click
+    typingEffect();
+
+    // redirect after animation
+    setTimeout(() => {
+
+        splash.classList.add("fade-out");
+
+        audio.pause();
+        audio.currentTime = 0;
+
+        setTimeout(()=>{
+            window.location.href = "/home";
+        },1000);
+
+    },4000);
+
+    // remove event after first click
+    document.removeEventListener("click", startExperience);
+}
+
+/* wait for user interaction */
+document.addEventListener("click", startExperience);
+
+</script>
+</body>
+</html>
