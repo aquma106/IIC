@@ -1,1612 +1,860 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIC UIT Shimla | Innovation Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* ============================================================ ROOT & RESET ============================================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            --sky: #38bdf8;
+            --green: #22c55e;
+            --purple: #a855f7;
+            --bg: #020617;
+            --card-bg: rgba(5,10,30,0.93);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: white;
+            overflow-x: hidden;
+        }
 
-<title>IIC UIT Shimla | Innovation Portal</title>
+        /* ============================================================ CUSTOM CURSOR ============================================================ */
+        .cursor {
+            width:10px; height:10px; background:var(--sky); border-radius:50%;
+            position:fixed; pointer-events:none; z-index:9999; mix-blend-mode:screen;
+        }
+        .cursor-ring {
+            width:34px; height:34px; border:1.5px solid rgba(56,189,248,.5);
+            border-radius:50%; position:fixed; pointer-events:none; z-index:9998;
+            transition:all .18s ease;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        /* ============================================================ CANVASES ============================================================ */
+        #tech-canvas, #particle-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        #particle-canvas { opacity: .35; }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@500&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+        /* ============================================================ NAVBAR ============================================================ */
+        .navbar {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 1400px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 32px;
+            background: rgba(2,6,23,.85);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            z-index: 1100;
+            border: 1px solid rgba(56,189,248,.15);
+            box-shadow: 0 8px 40px rgba(0,0,0,.6);
+        }
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-group img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: white;
+            padding: 5px;
+            transition: transform .4s, box-shadow .4s;
+        }
+        .logo-group img:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 20px var(--sky);
+        }
 
-<style>
-body{
-margin:0;
-font-family:'Poppins',sans-serif;
-background:#020617;
-color:white;
-overflow-x:hidden;
+        nav {
+            display: flex;
+            gap: 28px;
+        }
+        nav a {
+            color: rgba(255,255,255,.85);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            position: relative;
+            padding: 4px 0;
+        }
+        nav a::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--sky), var(--green));
+            transition: width .35s cubic-bezier(.4,0,.2,1);
+        }
+        nav a:hover {
+            color: var(--sky);
+        }
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* ============================================================ EVENTS SIDE PANEL ============================================================ */
+ /* ============================================================ EVENTS SIDE PANEL (FIXED - NOT HIDDEN BEHIND NAVBAR) ============================================================ */
+#events-panel {
+    position: fixed;
+    right: 25px;
+    top: 180px;                    /* Increased spacing below navbar */
+    width: 320px;
+    max-height: calc(100vh - 220px); /* Better height calculation */
+    background: rgba(5, 10, 30, 0.94);
+    border: 1px solid rgba(56,189,248,.32);
+    border-radius: 20px;
+    backdrop-filter: blur(22px);
+    box-shadow: -10px 10px 60px rgba(0,0,0,.6);
+    z-index: 1200;                 /* Higher than navbar (1100) */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-/* ================= NAVBAR ================= */
+.ep-header {
+    padding: 18px 22px;
+    background: linear-gradient(90deg, rgba(56,189,248,.20), rgba(168,85,247,.12));
+    border-bottom: 1px solid rgba(56,189,248,.3);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1.8px;
+    color: var(--sky);
+    text-transform: uppercase;
+    font-weight: 500;
+}
+        #ep-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        #ep-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        #ep-list::-webkit-scrollbar-thumb {
+            background: rgba(56,189,248,.5);
+            border-radius: 10px;
+        }
 
-.navbar{
-position:fixed;
-top:15px;
-left:50%;
-transform:translateX(-50%);
-width:92%;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:12px 35px;
-background:rgba(0,0,0,0.75);
-backdrop-filter:blur(12px);
-border-radius:50px;
-z-index:1000;
-box-shadow:0 10px 40px rgba(0,0,0,0.5);
+        .ep-item {
+            background: rgba(56,189,248,.07);
+            border: 1px solid rgba(56,189,248,.18);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all .3s ease;
+        }
+        .ep-item:hover {
+            transform: translateX(-5px);
+            border-color: var(--sky);
+            box-shadow: 0 10px 30px rgba(56,189,248,.2);
+        }
+        .ep-tag {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--sky);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .ep-name {
+            font-weight: 600;
+            font-size: 14.5px;
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+        .ep-date {
+            font-size: 12.5px;
+            color: rgba(255,255,255,.65);
+        }
+
+        .ep-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: rgba(255,255,255,.45);
+            font-style: italic;
+        }
+
+        /* ============================================================ HERO ============================================================ */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(56,189,248,.06) 0%, transparent 70%), var(--bg);
+        }
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(56,189,248,.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(56,189,248,.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 2;
+        }
+        #float-img-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .drift-img {
+            position: absolute;
+            border-radius: 16px;
+            object-fit: cover;
+            opacity: 0;
+            box-shadow: 0 4px 40px rgba(56,189,248,.18);
+            transition: opacity 1s ease, transform 8s linear;
+        }
+
+        /* ============================================================ SECTIONS ============================================================ */
+        .section {
+            position: relative;
+            z-index: 2;
+            padding: 100px 10%;
+            text-align: center;
+        }
+        .section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(24px, 4vw, 38px);
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--sky), var(--green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+        }
+        .section-line {
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--sky), var(--green), var(--purple));
+            margin: 0 auto 50px;
+            transition: width 1s cubic-bezier(.4,0,.2,1);
+        }
+        .section-line.visible {
+            width: 140px;
+        }
+
+        .dashboard {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        .stat-card {
+            padding: 36px 48px;
+            border-radius: 20px;
+            background: rgba(56,189,248,.05);
+            border: 1px solid rgba(56,189,248,.22);
+            backdrop-filter: blur(12px);
+            transition: all .4s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 70px rgba(56,189,248,.25);
+        }
+        .counter {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 54px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--green), var(--sky));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+        }
+        .stat-card p {
+            font-size: 14px;
+            color: rgba(255,255,255,.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        /* ============================================================ TEAM CARDS ============================================================ */
+        .team-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 60px;
+        }
+        .team-card {
+            width: 300px;
+            padding: 44px 36px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(5,10,30,.95), rgba(10,25,20,.95));
+            border: 1px solid rgba(56,189,248,.25);
+            box-shadow: 0 0 30px rgba(56,189,248,.12);
+            text-align: center;
+            transition: all .5s cubic-bezier(.22,.68,0,1.2);
+        }
+        .team-card:hover {
+            transform: translateY(-14px) scale(1.03);
+            box-shadow: 0 30px 80px rgba(56,189,248,.35);
+        }
+        .team-card img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid transparent;
+            background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+                        linear-gradient(135deg, var(--sky), var(--green)) border-box;
+            margin-bottom: 18px;
+        }
+        .team-card h3 {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .team-card h4 {
+            font-size: 13px;
+            color: var(--green);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .team-card p {
+            font-size: 13.5px;
+            color: rgba(255,255,255,.75);
+            margin: 8px 0;
+        }
+        .team-card a {
+            color: var(--sky);
+            text-decoration: none;
+        }
+        .team-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* ============================================================ FOOTER ============================================================ */
+        .footer {
+            position: relative;
+            z-index: 2;
+            background: #000;
+            padding: 90px 60px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(56,189,248,.1);
+        }
+        .footer-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(22px, 3.5vw, 34px);
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--sky), var(--green), var(--purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+        }
+        .copyright {
+            margin-top: 60px;
+            padding-top: 25px;
+            border-top: 1px solid #1a1a2e;
+            font-size: 13.5px;
+            color: rgba(255,255,255,.4);
+        }
+        .copyright a {
+            color: var(--sky);
+            text-decoration: none;
+        }
+
+        @media (max-width: 1024px) {
+            #events-panel {
+                position: static;
+                width: 90%;
+                max-width: 420px;
+                margin: 50px auto;
+            }
+            .navbar {
+                width: 96%;
+                padding: 10px 20px;
+            }
+        }
+        .social-links {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-/* ================= LOGOS ================= */
-
-.logo-group{
-display:flex;
-align-items:center;
-gap:18px;
+.social-links a {
+  text-decoration: none;
+  color: #63b3ed;
+  font-size: 30px;
+  font-weight: 600;
+  transition: 0.3s;
 }
 
-.logo-group img{
-width:85px;
-height:85px;
-border-radius:50%;
-object-fit:contain;
-background:white;
-padding:6px;
-transition:0.4s;
+.social-links a:hover {
+  color: #f6ad55;
 }
-
-.logo-group img:hover{
-transform:scale(1.15) rotate(3deg);
-box-shadow:0 0 15px #38bdf8;
-}
-
-/* ================= NAV LINKS ================= */
-
-nav{
-display:flex;
-gap:25px;
-}
-
-nav a{
-color:white;
-text-decoration:none;
-font-weight:600;
-position:relative;
-transition:0.3s;
-}
-
-nav a:hover{
-color:#38bdf8;
-}
-
-nav a::after{
-content:"";
-display:block;
-width:0%;
-height:2px;
-background:#38bdf8;
-transition:0.3s;
-}
-
-nav a:hover::after{
-width:100%;
-}
-
-/* ================= HERO ================= */
-
-#ai-bg{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-}
-
-.hero{
-position:relative;
-height:100vh;
-
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-overflow:hidden;
-}
-.hero h1{
-font-family:'Orbitron', sans-serif;
-}
-
-
-.hero-content{
-z-index:2;
-}
-
-#ai-bg{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-}
-
-.hero h1{
-font-size:60px;
-letter-spacing:3px;
-}
-.hero p{
-    font-size:40px;
-}
-/* ================= SECTIONS ================= */
-
-.section{
-padding:100px 10%;
-text-align:center;
-}
-
-/* ================= DASHBOARD ================= */
-
-.dashboard{
-display:flex;
-justify-content:center;
-gap:70px;
-flex-wrap:wrap;
-margin-top:40px;
-}
-
-.counter{
-font-size:48px;
-color:#22c55e;
-font-weight:bold;
-}
-
-/* ================= TEAM GRID ================= */
-
-.team-grid{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:30px;
-margin-top:40px;
-margin-bottom:60px;   /* ADD THIS */
-}
-
-.section h2{
-margin-top:60px;
-margin-bottom:30px;
-}
-.team-grid{
-width:100%;
-clear:both;
-}
-/* ================================
-   FACULTY LEADERSHIP SECTION
-================================ */
-
-#faculty{
-padding-top:120px;
-}
-
-.faculty-leadership{
-display:flex;
-justify-content:center;
-align-items:center;
-margin-top:40px;
-margin-bottom:60px;
-}
-
-
-/* ================================
-   PRESIDENT CARD
-================================ */
-
-.president-card{
-
-position:relative;
-
-width:300px;
-
-padding:35px 25px;
-
-margin:0 auto;
-
-background:rgba(255,255,255,0.08);
-
-backdrop-filter:blur(14px);
-
-border-radius:22px;
-
-border:1px solid rgba(255,255,255,0.2);
-
-box-shadow:0 0 25px rgba(56,189,248,0.35);
-
-text-align:center;
-
-transition:0.4s ease;
-
-overflow:hidden;
-
-}
-
-
-/* HOVER */
-
-.president-card:hover{
-
-transform:translateY(-12px) scale(1.05);
-
-box-shadow:0 0 45px #38bdf8;
-
-}
-
-
-/* GLOW BORDER */
-
-.president-card::before{
-
-content:"";
-
-position:absolute;
-
-inset:-2px;
-
-border-radius:22px;
-
-background:linear-gradient(45deg,#38bdf8,#6366f1,#22c55e,#38bdf8);
-
-filter:blur(20px);
-
-opacity:0;
-
-z-index:-1;
-
-transition:0.4s;
-
-}
-
-.president-card:hover::before{
-opacity:1;
-}
-
-
-/* IMAGE */
-
-.president-card img{
-
-width:140px;
-
-height:140px;
-
-border-radius:50%;
-
-object-fit:cover;
-
-border:4px solid #38bdf8;
-
-box-shadow:0 0 18px #38bdf8;
-
-margin-bottom:18px;
-
-transition:0.4s;
-
-}
-
-.president-card:hover img{
-
-transform:scale(1.08);
-
-box-shadow:0 0 30px #38bdf8;
-
-}
-
-
-/* TEXT */
-
-.president-card h3{
-font-size:20px;
-font-weight:600;
-margin-bottom:6px;
-}
-
-.president-card p{
-font-size:15px;
-color:#cbd5f5;
-letter-spacing:0.5px;
-}
-/* ================= TEAM BUTTONS ================= */
-
-.team-buttons{
-margin-top:40px;
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-gap:15px;
-}
-
-.team-buttons button{
-font-family:'Montserrat', sans-serif !important;
-padding:12px 25px;
-
-border:none;
-
-border-radius:25px;
-
-background:#1e293b;
-
-color:white;
-
-font-weight:600;
-
-cursor:pointer;
-
-transition:0.4s;
-
-box-shadow:0 5px 20px rgba(0,0,0,0.4);
-
-}
-
-.team-buttons button:hover{
-
-background:#38bdf8;
-
-color:black;
-
-transform:scale(1.07);
-
-box-shadow:0 0 20px #38bdf8;
-
-}
-
-/* ================= TEAM DISPLAY ================= */
-
-#team-display{
-
-margin-top:40px;
-font-family: 'Montserrat', sans-serif;
-animation:fadeIn 0.6s ease;
-
-}
-
-@keyframes fadeIn{
-
-from{
-opacity:0;
-transform:translateY(20px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-
-}
-
-/* 3D FLIP CARD */
-
-.flip-card{
-width:260px;
-height:320px;
-perspective:1000px;
-}
-
-
-.flip-inner{
-position:relative;
-width:100%;
-height:100%;
-transition:transform 0.8s;
-transform-style:preserve-3d;
-}
-
-.flip-card:hover .flip-inner{
-transform:rotateY(180deg);
-}
-
-.flip-front,
-.flip-back{
-position:absolute;
-width:100%;
-height:100%;
-backface-visibility:hidden;
-border-radius:20px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-padding:25px;
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(10px);
-}
-
-.flip-back{
-transform:rotateY(180deg);
-}
-
-.flip-front img{
-width:130px;
-height:130px;
-border-radius:50%;
-object-fit:cover;
-border:4px solid #38bdf8;
-margin-bottom:15px;
-}
-/* ================= PRESIDENT SPECIAL ================= */
-
-.president .flip-card{
-
-width:260px;
-height:330px;
-
-}
-
-.president .flip-card::before{
-
-background:linear-gradient(
-60deg,
-gold,
-orange,
-gold
-);
-
-animation:presGlow 3s linear infinite;
-
-opacity:1;
-
-}
-
-@keyframes presGlow{
-
-0%{filter:hue-rotate(0deg);}
-100%{filter:hue-rotate(360deg);}
-
-}
-
-/* ================= MODAL ================= */
-
-.modal{
-
-display:none;
-
-position:fixed;
-
-top:0;
-
-left:0;
-
-width:100%;
-
-height:100%;
-
-background:rgba(0,0,0,0.85);
-
-justify-content:center;
-
-align-items:center;
-
-}
-
-.modal-content{
-
-background:white;
-
-color:black;
-
-padding:30px;
-
-border-radius:10px;
-
-text-align:center;
-
-width:320px;
-
-}
-
-/* ================= FOOTER ================= */
-
-.footer{
-
-background:#020617;
-
-padding:25px;
-
-text-align:center;
-
-font-size:14px;
-
-color:#cbd5f5;
-
-border-top:1px solid rgba(255,255,255,0.1);
-
-margin-top:80px;
-
-}
-
-.footer a{
-
-color:#38bdf8;
-
-text-decoration:none;
-
-}
-
-.footer a:hover{
-
-text-decoration:underline;
-
-}
-</style>
+    </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
 
-<header class="navbar">
+    <!-- Background Canvases -->
+    <canvas id="tech-canvas"></canvas>
+    <canvas id="particle-canvas"></canvas>
 
-<div class="logo-group">
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="logo-group">
+            <img src="../static/images/logo.jpg" alt="Logo 1">
+            <img src="../static/images/logo3.png" alt="Logo 2">
+            <img src="../static/images/logo4.png" alt="Logo 3">
+            <img src="../static/images/logo7.jpg" alt="Logo 4">
+        </div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="/admin-login-page">Admin</a>
+            <a href="/council">Council</a>
+            <a href="/events">Events</a>
+            <a href="/gallery">Photo Gallery</a>
+        </nav>
+    </header>
 
-<img src="../static/images/logo.jpg">
-<img src="../static/images/logo2.jpg">
-<img src="../static/images/logo3.png">
-<img src="../static/images/logo4.png">
-<img src="../static/images/logo7.jpg">
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-grid"></div>
+        <div id="float-img-layer"></div>
+        <div class="hero-content">
+            <h1>Institution's Innovation Council</h1>
+            <p>University Institute of Technology Shimla</p>
+        </div>
+    </section>
 
+    <!-- INNOVATION DASHBOARD -->
+    <section class="section">
+        <h2 class="reveal">Innovation Dashboard</h2>
+        <div class="section-line"></div>
+        <div class="dashboard">
+            <div class="stat-card reveal">
+                <h2 class="counter" data-target="120">0</h2>
+                <p>Projects</p>
+            </div>
+            <div class="stat-card reveal">
+                <h2 class="counter" data-target="40">0</h2>
+                <p>Events</p>
+            </div>
+            <div class="stat-card reveal">
+                <h2 class="counter" data-target="15">0</h2>
+                <p>Startups</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- UPCOMING EVENTS SIDE PANEL -->
+    <div id="events-panel">
+        <div class="ep-header">
+            ⚡ UPCOMING EVENTS
+        </div>
+        <div id="ep-list">
+            <div class="ep-empty">Loading upcoming events...</div>
+        </div>
+    </div>
+
+    <!-- TEAM / COUNCIL SECTION -->
+    <section class="section" id="council">
+        <h2 class="footer-title reveal">Meet Our Team</h2>
+        <div class="section-line"></div>
+        <div class="team-container">
+            <div class="team-card reveal">
+                <img src="../static/images/aradhya.jpg" alt="Aradhya Kaul">
+                <h3>Aradhya Kaul</h3>
+                <h4>Senior Developer</h4>
+                <p>📧 <a href="mailto:aradhyakaul540@gmail.com">aradhyakaul540@gmail.com</a></p>
+                <p>💻 <a href="https://www.linkedin.com/in/aradhya-kaul-237459386/" target="_blank">LinkedIn Profile</a></p>
+            </div>
+            <div class="team-card reveal">
+                <img src="../static/images/harsh.jpg" alt="Harsh Thakur">
+                <h3>Harsh Thakur</h3>
+                <h4>Developer</h4>
+                <p>📧 <a href="mailto:harshapricity41@gmail.com">harshapricity41@gmail.com</a></p>
+                <p>💻 <a href="https://in.linkedin.com/in/haarsh-thakur-9127493a3" target="_blank">LinkedIn Profile</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <div class="social-links">
+  <a href="https://www.instagram.com/iic_uit_official?utm_source=qr&igsh=MWJzYXA0c2FodDNoOA==" target="_blank">
+    <i class="fab fa-instagram"></i>
+  </a>
+  <a href="https://www.facebook.com/100064048059983/posts/pfbid0g37x6Ss9KqMDferPkvi6AKVmmsyiWW8TXZva4qch88FjEGXoLokqdXxnkECQ5C9Rl/" target="_blank">
+    <i class="fab fa-facebook"></i>
+  </a>
+  <a href="https://linkedin.com/in/your_profile" target="_blank">
+    <i class="fab fa-linkedin"></i>
+  </a>
 </div>
-
-
-<nav>
-<a href="#">Home</a>
-<a href="#faculty">faculty</a>
-<a href="#teams">Teams</a>
-<a href="#faculty-login">Faculty-Login</a>
-<a href="#">Student-Coordinator-Login</a>
-<a href="#">Events</a>
-</nav>
-</header>
-
-
-<!-- HERO -->
-
-<section class="hero">
-
-<div id="ai-bg"></div>
-
-<div class="hero-content">
-<h1>Institution's Innovation Council</h1>
-<p>University Institute of Technology Shimla</p>
-</div>
-
-</section>
-
-<!-- DASHBOARD -->
-
-<section class="section">
-
-<h2>Innovation Dashboard</h2>
-
-<div class="dashboard">
-
-<div>
-<h2 class="counter" data-target="120">0</h2>
-<p>Projects</p>
-</div>
-
-<div>
-<h2 class="counter" data-target="40">0</h2>
-<p>Events</p>
-</div>
-
-<div>
-<h2 class="counter" data-target="15">0</h2>
-<p>Startups</p>
-</div>
-
-</div>
-</section>
-
-<section id="faculty" class="section">
-
-<h2>IIC Faculty Leadership</h2>
-
-<!-- PRESIDENT -->
-
-<div class="faculty-leadership">
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/president.jpg">
-<h3>Dr. Kapil Bhatt</h3>
-<p>IIC President & IPR Cell Coordinator</p>
-</div>
-
-<div class="flip-back">
-<h3>Dr. Kapil Bhatt</h3>
-<p>Electronics & Communication Engineering</p>
-<p>IPR Cell Coordinator</p>
-</div>
-
-</div>
-</div>
-
-</div>
-
-
-<!-- VICE PRESIDENT -->
-
-<h2>Vice President</h2>
-
-<div class="team-grid">
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/vp.jpg">
-<h3>Dr. Rajesh Chauhan</h3>
-<p>Vice President</p>
-</div>
-
-<div class="flip-back">
-<h3>Dr. Rajesh Chauhan</h3>
-<p>Vice President</p>
-</div>
-
-</div>
-</div>
-
-</div>
-
-
-<!-- FACULTY COORDINATORS -->
-
-<h2>Faculty Coordinators</h2>
-
-<div class="team-grid">
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/faculty1.jpg">
-<h3>Er. Sunil Kumar</h3>
-<p>Convenyer</p>
-</div>
-<div class="flip-back">
-<p>Convenyer</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/faculty2.jpeg">
-<h3>Dr. Neeru Sharma</h3>
-<p>NIRF Coordinator</p>
-</div>
-<div class="flip-back">
-<p>NIRF Coordinator</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/faculty3.jpeg">
-<h3>Dr. Richa Chandel</h3>
-<p>ARIIA Coordinator</p>
-</div>
-<div class="flip-back">
-<p>Dr. Richa Chandel</p>
-<p></p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/faculty4.jpeg">
-<h3>Er. Harish Chand</h3>
-<p>Internship Coordinator</p>
-</div>
-<div class="flip-back">
-<p>Internship Coordinator</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/faculty5.jpeg">
-<h3>Dr. Anjali Sharma</h3>
-<p>Entrepreneurship Coordinator</p>
-</div>
-<div class="flip-back">
-<p>Entrepreneurship Coordinator</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="images/faculty6.jpg">
-<h3>Dr</h3>
-<p>Social Media Coordinator</p>
-</div>
-<div class="flip-back">
-<p>Social Media Coordinator</p>
-</div>
-</div>
-</div>
-
-</div>
-
-</section>
-<section id="teams" class="section">
-
-<h2>IIC Teams</h2>
-
-<div class="team-buttons">
-
-<button onclick="showTeam('Student-President')">Student President</button>
-
-<button onclick="showTeam('Intellectual Property Rights')">IPR Team</button>
-
-<button onclick="showTeam('ARIIA')">ARIIA Team</button>
-
-<button onclick="showTeam('startup')">Startup Team</button>
-
-<button onclick="showTeam('Internship')">Internship Team</button>
-
-<button onclick="showTeam('Innovation')">Innovation Team</button>
-
-<button onclick="showTeam('Enterpreneurship')">Enterpreneurship Team</button>
-
-<button onclick="showTeam('NIRF')">NIRF & Student Convener Team</button>
-
-<button onclick="showTeam('Social Media')">Social Media Team</button>
-
-</div>
-
-<div id="team-display"></div>
-
-</section>
-
-
-<!-- FOOTER -->
-
-<footer class="footer">
-
-<p>© <span id="year"></span> Institution's Innovation Council, UIT Shimla. All Rights Reserved.</p>
-
-<p>
-For Technical Assistance contact:
-<a href="mailto:AradhyaKaul540@gmail.com">AradhyaKaul540@gmail.com</a>
-</p>
-
-</footer>
-
-<script>
-document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-
-
-
-
-<!-- PROFILE MODAL -->
-
-<div id="profileModal" class="modal">
-
-<div class="modal-content">
-
-<h2 id="name"></h2>
-<p id="role"></p>
-<p id="dept"></p>
-
-<button onclick="closeProfile()">Close</button>
-
-</div>
-
-</div>
-
-
-<script>
-
-/* ================================
-   YEAR AUTO UPDATE
-================================ */
-
-document.getElementById("year").textContent = new Date().getFullYear();
-
-
-
-/* ================================
-   INNOVATION COUNTER ANIMATION
-================================ */
-
-const counters = document.querySelectorAll('.counter');
-
-counters.forEach(counter => {
-
-function updateCounter(){
-
-const target = +counter.getAttribute("data-target");
-const count = +counter.innerText;
-
-const increment = target / 40;
-
-if(count < target){
-
-counter.innerText = Math.ceil(count + increment);
-
-setTimeout(updateCounter,40);
-
-}else{
-
-counter.innerText = target;
-
+        <div class="copyright">
+            © <span id="year"></span> Institution's Innovation Council, UIT Shimla. All Rights Reserved.<br>
+            Technical Assistance: <a href="mailto:AradhyaKaul540@gmail.com">AradhyaKaul540@gmail.com</a>
+        </div>
+    </footer>
+
+    <!-- ============================================================ JAVASCRIPT ============================================================ -->
+    <script>
+        // Update Year
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // Custom Cursor Animation
+        const cursor = document.getElementById("cursor");
+        const ring = document.getElementById("cursorRing");
+        let mx = 0, my = 0, rx = 0, ry = 0;
+
+        document.addEventListener("mousemove", e => {
+            mx = e.clientX;
+            my = e.clientY;
+        });
+
+        function animateCursor() {
+            cursor.style.left = mx - 5 + "px";
+            cursor.style.top = my - 5 + "px";
+            rx += (mx - rx) * 0.12;
+            ry += (my - ry) * 0.12;
+            ring.style.left = rx - 17 + "px";
+            ring.style.top = ry - 17 + "px";
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Hover Effects
+        document.querySelectorAll("a, .stat-card, .team-card").forEach(el => {
+            el.addEventListener("mouseenter", () => {
+                ring.style.transform = "scale(1.7)";
+                ring.style.borderColor = "rgba(56,189,248,.85)";
+            });
+            el.addEventListener("mouseleave", () => {
+                ring.style.transform = "scale(1)";
+                ring.style.borderColor = "rgba(56,189,248,.5)";
+            });
+        });
+
+        // Counter Animation
+        let countersDone = false;
+        function runCounters() {
+            if (countersDone) return;
+            countersDone = true;
+            document.querySelectorAll('.counter').forEach(el => {
+                const target = parseInt(el.getAttribute("data-target"));
+                let count = 0;
+                const increment = target / 60;
+                const timer = setInterval(() => {
+                    count += increment;
+                    if (count >= target) {
+                        el.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        el.textContent = Math.floor(count);
+                    }
+                }, 25);
+            });
+        }
+
+        // Scroll Reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    if (entry.target.classList.contains("stat-card")) runCounters();
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll(".reveal, .section-line").forEach(el => observer.observe(el));
+
+        // Load Events from Backend API
+        async function loadEvents() {
+            try {
+                const response = await fetch('/api/events');
+                const events = await response.json();
+                const listContainer = document.getElementById('ep-list');
+                listContainer.innerHTML = '';
+
+                if (!events || events.length === 0) {
+                    listContainer.innerHTML = `<div class="ep-empty">No upcoming events at the moment.</div>`;
+                    return;
+                }
+
+                events.forEach(event => {
+                    const item = document.createElement('div');
+                    item.className = 'ep-item';
+                    item.innerHTML = `
+                        <div class="ep-tag">EVENT</div>
+                        <div class="ep-name">${event.event_name || event.name}</div>
+                        <div class="ep-date">${event.date}</div>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            } catch (error) {
+                console.error("Failed to load events:", error);
+                document.getElementById('ep-list').innerHTML = 
+                    `<div class="ep-empty">Unable to load events right now.</div>`;
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            loadEvents();
+        });
+
+        /* ======================================================
+   CORE TECH SYMBOLS ANIMATION (Branch Representation)
+   Paste this inside your <script> tag
+====================================================== */
+
+const tc = document.getElementById("tech-canvas");
+const tctx = tc.getContext("2d");
+let TW, TH;
+
+function tcResize() {
+    TW = tc.width = window.innerWidth;
+    TH = tc.height = window.innerHeight;
+}
+tcResize();
+window.addEventListener("resize", tcResize);
+
+/* --- Symbol Definitions (Branch-specific) --- */
+const SYMBOLS = [
+    // CSE: Circuit Chip
+    {
+        branch: 'CSE',
+        color: '#38bdf8',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.strokeStyle = '#38bdf8';
+            c.lineWidth = 1.2;
+            const h = s * 0.55, p = s * 0.18, pin = s * 0.22;
+            c.strokeRect(x - h, y - h, h * 2, h * 2);
+            const pins = [-h*0.6, -h*0.2, h*0.2, h*0.6];
+            pins.forEach(d => {
+                c.beginPath(); c.moveTo(x - h, y + d); c.lineTo(x - h - pin, y + d); c.stroke();
+                c.beginPath(); c.moveTo(x + h, y + d); c.lineTo(x + h + pin, y + d); c.stroke();
+                c.beginPath(); c.moveTo(x + d, y - h); c.lineTo(x + d, y - h - pin); c.stroke();
+                c.beginPath(); c.moveTo(x + d, y + h); c.lineTo(x + d, y + h + pin); c.stroke();
+            });
+            c.beginPath(); c.moveTo(x - p, y); c.lineTo(x + p, y); c.stroke();
+            c.beginPath(); c.moveTo(x, y - p); c.lineTo(x, y + p); c.stroke();
+            c.restore();
+        }
+    },
+    // CSE: Binary
+    {
+        branch: 'CSE',
+        color: '#38bdf8',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.font = `${s * 0.22}px 'Orbitron', monospace`;
+            c.fillStyle = '#38bdf8';
+            const bits = ['01', '10', '11', '00'];
+            bits.forEach((b, i) => {
+                c.fillText(b, x + (i % 2) * s * 0.3 - s * 0.15, y + Math.floor(i / 2) * s * 0.25 - s * 0.1);
+            });
+            c.restore();
+        }
+    },
+    // ECE: Sine Wave
+    {
+        branch: 'ECE',
+        color: '#a855f7',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.strokeStyle = '#a855f7';
+            c.lineWidth = 1.5;
+            c.beginPath();
+            for (let i = 0; i <= 60; i++) {
+                const px = x - s * 0.7 + i * (s * 1.4 / 60);
+                const py = y + Math.sin(i / 60 * Math.PI * 2) * s * 0.35;
+                i === 0 ? c.moveTo(px, py) : c.lineTo(px, py);
+            }
+            c.stroke();
+            c.restore();
+        }
+    },
+    // ECE: Antenna / RF
+    {
+        branch: 'ECE',
+        color: '#a855f7',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.strokeStyle = '#a855f7';
+            c.lineWidth = 1.2;
+            c.beginPath(); c.moveTo(x, y + s * 0.5); c.lineTo(x, y - s * 0.3); c.stroke();
+            [0.25, 0.45, 0.65].forEach(r => {
+                c.beginPath();
+                c.arc(x, y - s * 0.3, s * r, -Math.PI * 0.75, -Math.PI * 0.25);
+                c.stroke();
+            });
+            c.restore();
+        }
+    },
+    // EEE: Lightning Bolt
+    {
+        branch: 'EEE',
+        color: '#eab308',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.strokeStyle = '#eab308';
+            c.lineWidth = 1.8;
+            c.beginPath();
+            c.moveTo(x + s * 0.15, y - s * 0.55);
+            c.lineTo(x - s * 0.2, y + s * 0.05);
+            c.lineTo(x + s * 0.08, y + s * 0.05);
+            c.lineTo(x - s * 0.15, y + s * 0.55);
+            c.lineTo(x + s * 0.2, y - s * 0.05);
+            c.lineTo(x - s * 0.08, y - s * 0.05);
+            c.stroke();
+            c.restore();
+        }
+    },
+    // EEE: Coil / Inductor
+    {
+        branch: 'EEE',
+        color: '#eab308',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.strokeStyle = '#eab308';
+            c.lineWidth = 1.3;
+            const n = 5, r = s * 0.15, step = r * 2 * 1.1;
+            const startX = x - n * step / 2;
+            c.beginPath(); c.moveTo(startX - r * 0.8, y); c.lineTo(startX, y); c.stroke();
+            c.beginPath(); c.moveTo(startX + n * step, y); c.lineTo(startX + n * step + r * 0.8, y); c.stroke();
+            for (let i = 0; i < n; i++) {
+                c.beginPath();
+                c.arc(startX + i * step + r, y, r, Math.PI, 0);
+                c.stroke();
+            }
+            c.restore();
+        }
+    },
+    // Civil: I-Beam
+    {
+        branch: 'CIVIL',
+        color: '#f97316',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.strokeStyle = '#f97316';
+            c.lineWidth = 1.5;
+            const w = s * 0.6, h = s * 0.7, tw = s * 0.12;
+            c.strokeRect(x - w / 2, y - h / 2, w, tw);
+            c.strokeRect(x - w / 2, y + h / 2 - tw, w, tw);
+            c.strokeRect(x - tw / 2, y - h / 2 + tw, tw, h - tw * 2);
+            c.restore();
+        }
+    },
+    // Civil: Truss Triangle
+    {
+        branch: 'CIVIL',
+        color: '#f97316',
+        draw(c, x, y, s, a) {
+            c.save();
+            c.globalAlpha = a;
+            c.strokeStyle = '#f97316';
+            c.lineWidth = 1.3;
+            const base = s * 0.9, ht = s * 0.75;
+            c.beginPath();
+            c.moveTo(x - base / 2, y + ht * 0.4);
+            c.lineTo(x + base / 2, y + ht * 0.4);
+            c.lineTo(x, y - ht * 0.6);
+            c.closePath();
+            c.stroke();
+            c.beginPath();
+            c.moveTo(x, y + ht * 0.4);
+            c.lineTo(x, y - ht * 0.6);
+            c.stroke();
+            c.restore();
+        }
+    }
+];
+
+/* --- TechSymbol Class --- */
+class TechSymbol {
+    constructor() {
+        this.reset(true);
+    }
+    reset(init) {
+        const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        this.sym = sym;
+        this.size = 22 + Math.random() * 36;
+        this.x = Math.random() * TW;
+        this.y = init ? Math.random() * TH : TH + this.size;
+        this.vx = (Math.random() - 0.5) * 0.25;
+        this.vy = -(0.18 + Math.random() * 0.35);
+        this.rot = Math.random() * Math.PI * 2;
+        this.vrot = (Math.random() - 0.5) * 0.008;
+        this.alpha = 0.06 + Math.random() * 0.15;
+        this.life = 0;
+        this.maxLife = 400 + Math.random() * 400;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.rot += this.vrot;
+        this.life++;
+        if (this.y < -this.size * 2 || this.life > this.maxLife) this.reset(false);
+    }
+    draw() {
+        tctx.save();
+        tctx.translate(this.x, this.y);
+        tctx.rotate(this.rot);
+        const fade = Math.min(this.life / 40, 1) * Math.min((this.maxLife - this.life) / 40, 1);
+        this.sym.draw(tctx, 0, 0, this.size, this.alpha * fade);
+        tctx.restore();
+    }
 }
 
-}
-
-updateCounter();
-
-});
-
-
-
-/* ================================
-   PROFILE MODAL SYSTEM
-================================ */
-
-function openProfile(name, role, dept){
-
-const modal = document.getElementById("profileModal");
-
-modal.style.display = "flex";
-
-document.getElementById("name").innerText = name;
-
-document.getElementById("role").innerText = "Role: " + role;
-
-document.getElementById("dept").innerText = "Department: " + dept;
-
-}
-
-
-function closeProfile(){
-
-document.getElementById("profileModal").style.display = "none";
-
-}
-
-
-
-/* ================================
-   TEAM FILTER SYSTEM
-================================ */
-
-
-
-function showTeam(team){
-
-let html = "";
-
-/* ================================
-   PRESIDENT
-================================ */
-
-if(team === "Student-President"){
-
-html = `
-
-<h3>IIC Leadership</h3>
-
-<div class="faculty-leadership">
-
-<div class="flip-card">
-
-<div class="flip-inner">
-
-<div class="flip-front">
-
-<img src="../static/images/">
-
-<h3>Devansh Sharma</h3>
-
-<p>Student-President (IIC)</p>
-
-</div>
-
-<div class="flip-back">
-
-<h3>Dr. ABC Sharma</h3>
-
-<p>Department: Computer Science</p>
-
-<p>Institution Innovation Council President</p>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
-}
-/* ================================
-   IPR TEAM
-================================ */
-
-if(team === "Intellectual Property Rights"){
-
-html = `
-
-<h3>IPR Team</h3>
-
-<div class="team-grid">
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/aradhya.jpg">
-<h3>Aradhya Kaul</h3>
-<p>IPR Student Coordinator</p>
-</div>
-<div class="flip-back">
-<p>Department:ECE</p>
-<p>IPR Lead</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/member.jpg">
-<h3>Rhydhum Sharma</h3>
-<p>IPR Member</p>
-</div>
-<div class="flip-back">
-<p>CSE</p>
-<p>IPR Team</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/agam.jpg">
-<h3>Agam Sharma</h3>
-<p>IPR Member</p>
-</div>
-<div class="flip-back">
-<p>Department: EE</p>
-<p>IPR Member</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/member3.jpg">
-<h3>Member 3</h3>
-<p>Team Member</p>
-</div>
-<div class="flip-back">
-<p>Department: ECE</p>
-<p>Documentation</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/member4.jpg">
-<h3>Member 4</h3>
-<p>Team Member</p>
-</div>
-<div class="flip-back">
-<p>Department: Mechanical</p>
-<p>Legal Research</p>
-</div>
-</div>
-</div>
-
-</div>
-`;
-
-}
-
-
-/* ================================
-   ARIIA TEAM
-================================ */
-
-if(team === "ARIIA"){
-
-html = `
-
-<h3>ARIIA Team</h3>
-
-<div class="team-grid">
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/aradhya.jpg">
-<h3>Aradhya Kaul</h3>
-<p>ARIIA Coordinator</p>
-</div>
-<div class="flip-back">
-<p>ARIIA Coordinator</p>
-<p>Department: ECE</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/Member1.jpg">
-<h3>Rudraksh Raina</h3><p>Team Member</p>
-</div><div class="flip-back"><p>ARIIA</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/pawan.jpeg">
-<h3>Pawandeep Kumar</h3><p>ARIIA Member</p>
-</div><div class="flip-back"><p>Report Preparation</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/harsh.jpg">
-<h3>Harsh Thakur</h3><p>ARIIA Member</p>
-</div><div class="flip-back"><p>ARIIA Member</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/khusboo.jpeg">
-<h3>Khushboo</h3><p>ARIIA Member</p>
-</div><div class="flip-back"><p>ARIIA</p></div></div></div>
-
-</div>
-`;
-
-}
-
-
-/* ================================
-   STARTUP TEAM
-================================ */
-
-if(team === "startup"){
-
-html = `
-
-<h3>Startup Team</h3>
-
-<div class="team-grid">
-
-<div class="flip-card">
-<div class="flip-inner">
-<div class="flip-front">
-<img src="../static/images/startup-coordinator.jpg">
-<h3>Startup Coordinator</h3>
-<p>Team Coordinator</p>
-</div>
-<div class="flip-back">
-<p>Startup Mentorship</p>
-<p>Department: MBA</p>
-</div>
-</div>
-</div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member1.jpg">
-<h3>Member 1</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Startup Support</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member2.jpg">
-<h3>Member 2</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Mentorship Programs</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member3.jpg">
-<h3>Member 3</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Startup Research</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member4.jpg">
-<h3>Member 4</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Funding Assistance</p></div></div></div>
-
-</div>
-`;
-
-}
-
-
-/* ================================
-   INTERNSHIP TEAM
-================================ */
-
-if(team === "Internship"){
-
-html = `
-
-<h3>Internship Team</h3>
-
-<div class="team-grid">
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/internship-coordinator.jpg">
-<h3>Internship Coordinator</h3>
-<p>Team Coordinator</p>
-</div><div class="flip-back">
-<p>Placement & Internship</p>
-</div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/nody.jpg">
-<h3>Saksham Sharma</h3><p>Internship Member</p>
-</div><div class="flip-back"><p>Internship Member</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member2.jpg">
-<h3>Member 2</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Company Outreach</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member3.jpg">
-<h3>Member 3</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Student Support</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member4.jpg">
-<h3>Member 4</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Internship Data</p></div></div></div>
-
-</div>
-`;
-
-}
-
-
-/* ================================
-   INNOVATION TEAM
-================================ */
-
-if(team === "Innovation"){
-
-html = `
-
-<h3>Innovation Team</h3>
-
-<div class="team-grid">
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/innovation-coordinator.jpg">
-<h3>Innovation Coordinator</h3>
-<p>Team Coordinator</p>
-</div><div class="flip-back">
-<p>Innovation Programs</p>
-</div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/pranav.jpg">
-<h3>Pranav Sharma</h3><p>Innovation Member</p>
-</div><div class="flip-back"><p>Innovation Member</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member2.jpg">
-<h3>Member 2</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Prototype Support</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member3.jpg">
-<h3>Member 3</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Research Programs</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member4.jpg">
-<h3>Member 4</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Innovation Workshops</p></div></div></div>
-
-</div>
-`;
-
-}
-
-
-/* ================================
-   ENTREPRENEURSHIP TEAM
-================================ */
-
-if(team === "Enterpreneurship"){
-
-html = `
-
-<h3>Entrepreneurship Team</h3>
-
-<div class="team-grid">
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/entrepreneur-coordinator.jpg">
-<h3>Entrepreneurship Coordinator</h3>
-<p>Team Coordinator</p>
-</div><div class="flip-back">
-<p>Startup Ecosystem</p>
-</div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member1.jpg">
-<h3>Member 1</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Business Strategy</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member2.jpg">
-<h3>Member 2</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Startup Events</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member3.jpg">
-<h3>Member 3</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Investor Connect</p></div></div></div>
-
-<div class="flip-card"><div class="flip-inner"><div class="flip-front">
-<img src="../static/images/member4.jpg">
-<h3>Member 4</h3><p>Team Member</p>
-</div><div class="flip-back"><p>Entrepreneur Mentorship</p></div></div></div>
-
-</div>
-`;
-
-}
-
-/* ================================
-   NIRF & STUDENT CONVENER TEAM
-================================ */
-
-if(team === "NIRF"){
-
-html = `
-
-<h3>NIRF & Student Convener Team</h3>
-
-<div class="team-grid">
-
-<!-- COORDINATOR -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/nirf-coordinator.jpg">
-<h3>NIRF Coordinator</h3>
-<p>Team Coordinator</p>
-</div>
-
-<div class="flip-back">
-<p>Data Collection Lead</p>
-<p>Ranking Documentation</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- STUDENT CONVENER -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/student-convener.jpg">
-<h3>Student Convener</h3>
-<p>IIC Representative</p>
-</div>
-
-<div class="flip-back">
-<p>Event Coordination</p>
-<p>Student Management</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- MEMBER 1 -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/member1.jpg">
-<h3>Member 1</h3>
-<p>Team Member</p>
-</div>
-
-<div class="flip-back">
-<p>Data Analysis</p>
-<p>NIRF Metrics</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- MEMBER 2 -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/member2.jpg">
-<h3>Member 2</h3>
-<p>Team Member</p>
-</div>
-
-<div class="flip-back">
-<p>Documentation</p>
-<p>Report Preparation</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- MEMBER 3 -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/member3.jpg">
-<h3>Member 3</h3>
-<p>Team Member</p>
-</div>
-
-<div class="flip-back">
-<p>Survey Data</p>
-<p>Research Metrics</p>
-</div>
-
-</div>
-</div>
-
-</div>
-
-`;
-}
-
-/* ================================
-   SOCIAL MEDIA TEAM
-================================ */
-
-if(team === "Social Media"){
-
-html = `
-
-<h3>Social Media Team</h3>
-
-<div class="team-grid">
-
-<!-- COORDINATOR -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/social-coordinator.jpg">
-<h3>Social Media Coordinator</h3>
-<p>Team Coordinator</p>
-</div>
-
-<div class="flip-back">
-<p>Content Strategy</p>
-<p>Digital Branding</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- MEMBER 1 -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/member1.jpg">
-<h3>Member 1</h3>
-<p>Content Creator</p>
-</div>
-
-<div class="flip-back">
-<p>Post Designing</p>
-<p>Creative Content</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- MEMBER 2 -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/member2.jpg">
-<h3>Member 2</h3>
-<p>Graphic Designer</p>
-</div>
-
-<div class="flip-back">
-<p>Poster & Banner Design</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- MEMBER 3 -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/member3.jpg">
-<h3>Member 3</h3>
-<p>Content Writer</p>
-</div>
-
-<div class="flip-back">
-<p>Caption Writing</p>
-<p>Social Campaigns</p>
-</div>
-
-</div>
-</div>
-
-
-<!-- MEMBER 4 -->
-
-<div class="flip-card">
-<div class="flip-inner">
-
-<div class="flip-front">
-<img src="../static/images/member4.jpg">
-<h3>Member 4</h3>
-<p>Digital Manager</p>
-</div>
-
-<div class="flip-back">
-<p>Account Management</p>
-<p>Analytics & Reach</p>
-</div>
-
-</div>
-</div>
-
-</div>
-
-`;
-
-}
-
-document.getElementById("team-display").innerHTML = html;
-}
-
-
-
-
-/* ================================
-   THREE JS AI PARTICLE BACKGROUND
-================================ */
-
-const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(
-75,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-);
-
-const renderer = new THREE.WebGLRenderer({
-alpha:true,
-antialias:true
-});
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-document.getElementById("ai-bg").appendChild(renderer.domElement);
-
-
-
-/* PARTICLE SYSTEM */
-
-const geometry = new THREE.BufferGeometry();
-
-const vertices = [];
-
-for(let i=0;i<700;i++){
-
-vertices.push((Math.random()*2-1)*200);
-vertices.push((Math.random()*2-1)*200);
-vertices.push((Math.random()*2-1)*200);
-
-}
-
-geometry.setAttribute(
-'position',
-new THREE.Float32BufferAttribute(vertices,3)
-);
-
-
-
-const material = new THREE.PointsMaterial({
-
-color:0x38bdf8,
-size:2
-
-});
-
-
-
-const particles = new THREE.Points(geometry,material);
-
-scene.add(particles);
-
-
-camera.position.z = 150;
-
-
-
-/* ANIMATION LOOP */
-
-function animate(){
-
-requestAnimationFrame(animate);
-
-particles.rotation.x += 0.0005;
-particles.rotation.y += 0.001;
-
-renderer.render(scene,camera);
-
-}
-
-animate();
-
-
-
-/* RESPONSIVE FIX */
-
-window.addEventListener("resize", () => {
-
-camera.aspect = window.innerWidth / window.innerHeight;
-
-camera.updateProjectionMatrix();
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-});
-
-
-
-
-</script>
+const techSymbols = Array.from({ length: 55 }, () => new TechSymbol());
+
+(function animTech() {
+    tctx.clearRect(0, 0, TW, TH);
+    techSymbols.forEach(s => {
+        s.update();
+        s.draw();
+    });
+    requestAnimationFrame(animTech);
+})();
+    </script>
 </body>
 </html>

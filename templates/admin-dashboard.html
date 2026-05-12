@@ -1,46 +1,1726 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | UIT IIC</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IIC UIT Shimla — CRM Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #03060f;
+  --panel: #080d1f;
+  --panel2: #0c1428;
+  --border: rgba(56,189,248,0.15);
+  --accent: #38bdf8;
+  --accent2: #a78bfa;
+  --accent3: #34d399;
+  --accent4: #fb923c;
+  --danger: #f87171;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --glow: 0 0 24px rgba(56,189,248,0.18);
+  --glow2: 0 0 40px rgba(167,139,250,0.12);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(167,139,250,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 260px;
+  background: linear-gradient(180deg, #060b1e 0%, #03060f 100%);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  padding: 0 0 30px;
+}
+
+.logo-area {
+  padding: 28px 24px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.logo-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: white;
+  line-height: 1.2;
+}
+
+.logo-title span { color: var(--accent); }
+
+.sidebar-section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  padding: 20px 24px 8px;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 24px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  color: #94a3b8;
+  position: relative;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: white;
+  background: rgba(56,189,248,0.06);
+  border-left-color: var(--accent);
+}
+
+.nav-item.active { color: var(--accent); }
+
+.nav-icon {
+  width: 18px; height: 18px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.nav-item.active .nav-icon, .nav-item:hover .nav-icon { opacity: 1; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #000;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.nav-badge.purple { background: var(--accent2); }
+.nav-badge.green { background: var(--accent3); }
+.nav-badge.orange { background: var(--accent4); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 20px 24px 0;
+  border-top: 1px solid var(--border);
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.admin-info { flex: 1; min-width: 0; }
+.admin-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-role {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.logout-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--danger); padding: 4px; border-radius: 6px;
+  display: flex; align-items: center;
+  transition: background 0.2s;
+}
+.logout-btn:hover { background: rgba(248,113,113,0.1); }
+
+.main {
+  margin-left: 260px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.topbar {
+  background: rgba(6,11,30,0.95);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 50;
+}
+
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.page-title span {
+  color: var(--accent);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  display: block;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent3);
+  box-shadow: 0 0 8px var(--accent3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+
+.status-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent3);
+  letter-spacing: 1px;
+}
+
+.content {
+  padding: 36px 40px;
+}
+
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  border-color: rgba(56,189,248,0.3);
+  box-shadow: var(--glow);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 60px; height: 60px;
+  border-radius: 0 14px 0 60px;
+  opacity: 0.12;
+}
+
+.stat-card.blue::before { background: var(--accent); }
+.stat-card.purple::before { background: var(--accent2); }
+.stat-card.green::before { background: var(--accent3); }
+.stat-card.orange::before { background: var(--accent4); }
+
+.stat-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-card.blue .stat-value { color: var(--accent); }
+.stat-card.purple .stat-value { color: var(--accent2); }
+.stat-card.green .stat-value { color: var(--accent3); }
+.stat-card.orange .stat-value { color: var(--accent4); }
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.card-icon.blue { background: rgba(56,189,248,0.12); }
+.card-icon.purple { background: rgba(167,139,250,0.12); }
+.card-icon.green { background: rgba(52,211,153,0.12); }
+.card-icon.orange { background: rgba(251,146,60,0.12); }
+
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.card-body { padding: 24px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 9px;
+  border: 1px solid rgba(56,189,248,0.2);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.1);
+}
+
+.form-control::placeholder { color: var(--muted); font-size: 13px; }
+
+select.form-control option { background: #0c1428; }
+
+textarea.form-control {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.file-drop {
+  border: 2px dashed rgba(56,189,248,0.25);
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(56,189,248,0.02);
+  position: relative;
+}
+
+.file-drop:hover, .file-drop.dragover {
+  border-color: var(--accent);
+  background: rgba(56,189,248,0.05);
+}
+
+.file-drop input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+
+.file-drop-icon { font-size: 32px; margin-bottom: 10px; }
+
+.file-drop-text {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.file-drop-text strong { color: var(--accent); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px;
+  border-radius: 9px;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #0ea5e9);
+  color: #000;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(56,189,248,0.35); }
+
+.btn-secondary {
+  background: rgba(56,189,248,0.1);
+  color: var(--accent);
+  border: 1px solid rgba(56,189,248,0.2);
+}
+.btn-secondary:hover { background: rgba(56,189,248,0.18); }
+
+.btn-purple {
+  background: linear-gradient(135deg, var(--accent2), #7c3aed);
+  color: white;
+}
+.btn-purple:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(167,139,250,0.35); }
+
+.btn-green {
+  background: linear-gradient(135deg, var(--accent3), #059669);
+  color: #000;
+}
+.btn-danger {
+  background: rgba(248,113,113,0.1);
+  color: var(--danger);
+  border: 1px solid rgba(248,113,113,0.2);
+}
+.btn-danger:hover { background: rgba(248,113,113,0.2); }
+
+.btn-sm { padding: 7px 14px; font-size: 12px; }
+
+.btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+.type-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.type-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: all 0.2s;
+  background: var(--panel2);
+  color: var(--muted);
+  user-select: none;
+}
+
+.type-chip:hover { color: var(--text); }
+.type-chip.selected { background: rgba(56,189,248,0.12); border-color: var(--accent); color: var(--accent); }
+.type-chip.selected-hackathon { background: rgba(251,146,60,0.12); border-color: var(--accent4); color: var(--accent4); }
+.type-chip.selected-workshop { background: rgba(56,189,248,0.12); border-color: var(--accent); color: var(--accent); }
+.type-chip.selected-seminar { background: rgba(167,139,250,0.12); border-color: var(--accent2); color: var(--accent2); }
+.type-chip.selected-competition { background: rgba(248,113,113,0.12); border-color: var(--danger); color: var(--danger); }
+.type-chip.selected-bootcamp { background: rgba(52,211,153,0.12); border-color: var(--accent3); color: var(--accent3); }
+.type-chip.selected-expo { background: rgba(250,204,21,0.12); border-color: #facc15; color: #facc15; }
+.type-chip.selected-talk { background: rgba(244,114,182,0.12); border-color: #f472b6; color: #f472b6; }
+.type-chip.selected-other { background: rgba(148,163,184,0.12); border-color: #94a3b8; color: #94a3b8; }
+
+#eventTypeHidden { display: none; }
+
+.events-table { width: 100%; border-collapse: collapse; }
+
+.events-table th {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.events-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(56,189,248,0.06);
+  font-size: 13.5px;
+}
+
+.events-table tr:hover td { background: rgba(56,189,248,0.03); }
+
+.event-name-cell {
+  font-weight: 600;
+  color: white;
+}
+
+.event-name-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.badge-upcoming { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.2); }
+.badge-past { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.15); }
+.badge-hackathon { background: rgba(251,146,60,0.12); color: var(--accent4); border: 1px solid rgba(251,146,60,0.2); }
+.badge-workshop { background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.2); }
+.badge-seminar { background: rgba(167,139,250,0.12); color: var(--accent2); border: 1px solid rgba(167,139,250,0.2); }
+.badge-competition { background: rgba(248,113,113,0.12); color: var(--danger); border: 1px solid rgba(248,113,113,0.2); }
+.badge-bootcamp { background: rgba(52,211,153,0.12); color: var(--accent3); border: 1px solid rgba(52,211,153,0.2); }
+.badge-expo { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.2); }
+.badge-talk { background: rgba(244,114,182,0.12); color: #f472b6; border: 1px solid rgba(244,114,182,0.2); }
+.badge-other { background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.15); }
+
+.gallery-event-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.gallery-event-card:hover, .gallery-event-card.selected {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+.gallery-event-card.selected {
+  background: rgba(56,189,248,0.05);
+}
+
+.gallery-event-thumb {
+  height: 120px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(167,139,250,0.1));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+}
+
+.gallery-event-info { padding: 14px; }
+
+.gallery-event-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.gallery-event-meta {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.selected-check {
+  display: none;
+  position: absolute; top: 8px; right: 8px;
+  background: var(--accent);
+  color: #000;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 900;
+}
+
+.gallery-event-card.selected .selected-check { display: flex; }
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.preview-item {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel2);
+  position: relative;
+  border: 1px solid var(--border);
+}
+
+.preview-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+.preview-remove {
+  position: absolute; top: 4px; right: 4px;
+  background: rgba(0,0,0,0.7);
+  color: var(--danger);
+  border: none; border-radius: 50%;
+  width: 20px; height: 20px;
+  font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.upload-progress {
+  margin-top: 16px;
+  display: none;
+}
+
+.progress-bar {
+  height: 4px;
+  background: rgba(56,189,248,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent3));
+  border-radius: 2px;
+  transition: width 0.3s;
+  width: 0%;
+}
+
+.progress-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.events-split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+.event-mini-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: border-color 0.2s;
+}
+
+.event-mini-card:hover { border-color: rgba(56,189,248,0.25); }
+
+.event-mini-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.dot-upcoming { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.dot-past { background: var(--muted); }
+
+.event-mini-info { flex: 1; min-width: 0; }
+.event-mini-name { font-weight: 600; font-size: 13.5px; margin-bottom: 4px; }
+.event-mini-meta { font-size: 11px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; }
+
+.event-mini-actions { display: flex; gap: 6px; }
+
+.toast-container {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  min-width: 280px;
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.toast.success { border-left: 3px solid var(--accent3); }
+.toast.error { border-left: 3px solid var(--danger); }
+.toast.info { border-left: 3px solid var(--accent); }
+
+.toast-icon { font-size: 18px; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; }
+  to { opacity: 0; pointer-events: none; }
+}
+
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
+.empty-state p { font-size: 13px; }
+
+.team-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.team-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid rgba(56,189,248,0.2);
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.2s;
+  user-select: none;
+}
+.team-chip.selected {
+  background: rgba(56,189,248,0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.2); border-radius: 10px; }
+
+.gallery-lock-banner {
+  background: linear-gradient(135deg, rgba(248,113,113,0.08), rgba(251,146,60,0.08));
+  border: 1px solid rgba(248,113,113,0.2);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.gallery-lock-icon { font-size: 48px; margin-bottom: 12px; }
+.gallery-lock-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--danger); }
+.gallery-lock-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+@media (max-width: 1100px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">IIC Admin</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_logout') }}">Logout</a></li>
-        </ul>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo-area">
+    <div class="logo-badge">IIC • UIT Shimla</div>
+    <div class="logo-title">CRM <span>Command</span><br>Center</div>
+  </div>
+
+  <div class="sidebar-section-label">Core</div>
+  <div class="nav-item active" data-section="overview">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+    <span class="nav-badge" id="badgeOverview">—</span>
+  </div>
+
+  <div class="sidebar-section-label">Events</div>
+  <div class="nav-item" data-section="addEvent">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    Add Event
+  </div>
+  <div class="nav-item" data-section="upcoming">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Upcoming Events
+    <span class="nav-badge" id="badgeUpcoming">0</span>
+  </div>
+  <div class="nav-item" data-section="completed">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    Completed Events
+    <span class="nav-badge green" id="badgeCompleted">0</span>
+  </div>
+
+  <div class="sidebar-section-label">Media</div>
+  <div class="nav-item" data-section="gallery">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    Gallery Upload
+    <span class="nav-badge purple" id="badgeGallery">🖼</span>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="admin-profile">
+      <div class="avatar" id="avatarInitials">A</div>
+      <div class="admin-info">
+        <div class="admin-name" id="adminName">Administrator</div>
+        <div class="admin-role">SUPER ADMIN</div>
       </div>
-    </div>
-  </nav>
-  <div class="container mt-4">
-    <h2>Welcome, Admin!</h2>
-    <p>Use the sidebar to manage teams, faculty, students, events, and registrations.</p>
-    <div class="row mt-4">
-      <div class="col-md-4 mb-3">
-        <div class="card shadow-sm p-3">
-          <h5>Manage Teams</h5>
-          <a class="btn btn-primary mt-2" href="#">Go</a>
-        </div>
-      </div>
-      <div class="col-md-4 mb-3">
-        <div class="card shadow-sm p-3">
-          <h5>Manage Faculty</h5>
-          <a class="btn btn-primary mt-2" href="#">Go</a>
-        </div>
-      </div>
-      <div class="col-md-4 mb-3">
-        <div class="card shadow-sm p-3">
-          <h5>Manage Students</h5>
-          <a class="btn btn-primary mt-2" href="#">Go</a>
-        </div>
-      </div>
+      <button class="logout-btn" onclick="window.location.href='/logout'" title="Logout">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
   </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">
+      <span id="currentPageLabel">DASHBOARD</span>
+      <span id="currentPageTitle">Overview</span>
+    </div>
+    <div class="topbar-actions">
+      <div class="status-dot"></div>
+      <div class="status-text">LIVE</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="section-overview">
+      <div class="stats-row">
+        <div class="stat-card blue">
+          <div class="stat-label">Total Events</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Upcoming</div>
+          <div class="stat-value" id="statUpcoming">0</div>
+          <div class="stat-sub">Scheduled</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Completed</div>
+          <div class="stat-value" id="statCompleted">0</div>
+          <div class="stat-sub">Gallery ready</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">Gallery Photos</div>
+          <div class="stat-value" id="statPhotos">0</div>
+          <div class="stat-sub">Uploaded</div>
+        </div>
+      </div>
+
+      <div class="events-split">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">📅</div>
+            <div>
+              <div class="card-title">Upcoming Events</div>
+              <div class="card-subtitle">Scheduled & live</div>
+            </div>
+          </div>
+          <div class="card-body" id="overviewUpcoming">
+            <div class="empty-state"><div class="empty-icon">📭</div><p>No upcoming events</p></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon green">✅</div>
+            <div>
+              <div class="card-title">Completed Events</div>
+              <div class="card-subtitle">Past events</div>
+            </div>
+          </div>
+          <div class="card-body" id="overviewCompleted">
+            <div class="empty-state"><div class="empty-icon">📭</div><p>No completed events</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD EVENT -->
+    <div class="section" id="section-addEvent">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">✨</div>
+          <div>
+            <div class="card-title">Add New Event</div>
+            <div class="card-subtitle">Fill in all details to publish</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="eventForm">
+            <div class="form-group">
+              <label class="form-label">Event Type</label>
+              <div class="type-chips" id="typeChips">
+                <div class="type-chip" data-type="hackathon">⚡ Hackathon</div>
+                <div class="type-chip" data-type="workshop">🛠 Workshop</div>
+                <div class="type-chip" data-type="seminar">🎓 Seminar</div>
+                <div class="type-chip" data-type="competition">🏆 Competition</div>
+                <div class="type-chip" data-type="bootcamp">🚀 Bootcamp</div>
+                <div class="type-chip" data-type="expo">🌐 Expo / Fair</div>
+                <div class="type-chip" data-type="talk">🎤 Talk / Panel</div>
+                <div class="type-chip" data-type="other">📌 Other</div>
+              </div>
+              <input type="hidden" id="eventTypeHidden" name="event_type">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Event Name *</label>
+                <input class="form-control" id="ev_name" type="text" placeholder="e.g. InnoHack 2024" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Status</label>
+                <select class="form-control" id="ev_status">
+                  <option value="upcoming">🟢 Upcoming</option>
+                  <option value="past">⚫ Completed / Past</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" id="ev_desc" placeholder="Brief description of the event..."></textarea>
+            </div>
+
+            <div class="form-row three">
+              <div class="form-group">
+                <label class="form-label">Date</label>
+                <input class="form-control" id="ev_date" type="date">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Time</label>
+                <input class="form-control" id="ev_time" type="time">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Venue</label>
+                <input class="form-control" id="ev_venue" placeholder="e.g. Seminar Hall A">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Conducted By (Team)</label>
+              <div class="team-chips" id="teamChips">
+                <div class="team-chip" data-team="All Teams">All Teams</div>
+                <div class="team-chip" data-team="IPR Team">IPR Team</div>
+                <div class="team-chip" data-team="Startup">Startup</div>
+                <div class="team-chip" data-team="Innovation">Innovation</div>
+                <div class="team-chip" data-team="Social Media">Social Media</div>
+                <div class="team-chip" data-team="Technical">Technical</div>
+              </div>
+              <input type="hidden" id="ev_team" name="team">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Registration Link (optional)</label>
+                <input class="form-control" id="ev_reg" type="url" placeholder="https://...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Expected Participants</label>
+                <input class="form-control" id="ev_participants" type="number" placeholder="e.g. 100">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Cover Image</label>
+              <div class="file-drop" id="coverDrop">
+                <input type="file" id="ev_image" accept="image/*">
+                <div class="file-drop-icon">🖼️</div>
+                <div class="file-drop-text"><strong>Click to upload</strong> or drag & drop<br><span style="font-size:11px">PNG, JPG up to 5MB</span></div>
+              </div>
+              <div id="coverPreview" style="display:none; margin-top:12px;">
+                <img id="coverImg" style="width:100%; max-height:200px; object-fit:cover; border-radius:10px; border:1px solid var(--border);">
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button type="button" class="btn btn-primary" id="addEventBtn">
+                <span>🚀</span> Publish Event
+              </button>
+              <button type="reset" class="btn btn-secondary">
+                Reset
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPCOMING EVENTS -->
+    <div class="section" id="section-upcoming">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">📅</div>
+          <div>
+            <div class="card-title">Upcoming Events</div>
+            <div class="card-subtitle">All scheduled & live events</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table class="events-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Type</th>
+                <th>Team</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="upcomingBody">
+              <tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No upcoming events yet</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPLETED EVENTS -->
+    <div class="section" id="section-completed">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">✅</div>
+          <div>
+            <div class="card-title">Completed Events</div>
+            <div class="card-subtitle">Past events — gallery photos can be uploaded from Gallery section</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table class="events-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Type</th>
+                <th>Team</th>
+                <th>Date</th>
+                <th>Gallery</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="completedBody">
+              <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>No completed events yet</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GALLERY UPLOAD -->
+    <div class="section" id="section-gallery">
+      <div id="galleryContent">
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card-header">
+            <div class="card-icon purple">🖼️</div>
+            <div>
+              <div class="card-title">Gallery Upload</div>
+              <div class="card-subtitle">Upload multiple photos for completed events only</div>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <div class="form-group">
+              <label class="form-label">Step 1 — Select Completed Event</label>
+              <div class="three-col" id="galleryEventList" style="margin-top:8px;">
+                <div class="empty-state" style="grid-column:1/-1;">
+                  <div class="empty-icon">📭</div><p>No completed events available</p>
+                </div>
+              </div>
+              <input type="hidden" id="selectedGalleryEvent">
+            </div>
+
+            <hr class="section-divider">
+
+            <div class="form-group">
+              <label class="form-label">Step 2 — Upload Photos</label>
+              <div class="file-drop" id="galleryDrop">
+                <input type="file" id="gallery_images" accept="image/*" multiple>
+                <div class="file-drop-icon">📸</div>
+                <div class="file-drop-text">
+                  <strong>Click to select multiple photos</strong><br>
+                  <span style="font-size:11px">JPG, PNG, WEBP — Select an event first</span>
+                </div>
+              </div>
+              <div class="preview-grid" id="galleryPreviewGrid"></div>
+            </div>
+
+            <div class="upload-progress" id="uploadProgress">
+              <div class="progress-text" id="progressText">Uploading 0 / 0...</div>
+              <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            </div>
+
+            <hr class="section-divider">
+
+            <div class="btn-row">
+              <button class="btn btn-purple" id="uploadGalleryBtn">
+                <span>🚀</span> Upload to Gallery
+              </button>
+              <button class="btn btn-secondary btn-sm" id="clearGalleryBtn">Clear Selection</button>
+              <span id="uploadCount" style="font-family:Space Mono,monospace; font-size:11px; color:var(--muted);"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon purple">🗂️</div>
+            <div>
+              <div class="card-title">Uploaded Galleries</div>
+              <div class="card-subtitle">Photos per completed event</div>
+            </div>
+          </div>
+          <div class="card-body" id="uploadedGalleries">
+            <div class="empty-state"><div class="empty-icon">🖼️</div><p>No photos uploaded yet</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// =====================================================
+// CONFIG
+// =====================================================
+const API_EVENTS = "/api/events";
+const API_UPLOAD = "/api/event-gallery/";
+
+// =====================================================
+// GLOBAL STATE
+// =====================================================
+let state = {
+  events: [],
+  selectedGalleryFiles: []
+};
+
+// =====================================================
+// TOAST NOTIFICATIONS
+// =====================================================
+function toast(msg, type = "info") {
+  const container = document.getElementById("toastContainer");
+  const icons = { success: "✅", error: "❌", info: "ℹ️" };
+  
+  const toastEl = document.createElement("div");
+  toastEl.className = `toast ${type}`;
+  toastEl.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span>${msg}</span>`;
+  
+  container.appendChild(toastEl);
+  
+  setTimeout(() => {
+    toastEl.remove();
+  }, 3000);
+}
+
+// =====================================================
+// NAVIGATION
+// =====================================================
+function showSection(sectionKey) {
+  document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+  
+  const target = document.getElementById("section-" + sectionKey);
+  if (target) target.classList.add("active");
+  
+  // Update topbar title
+  const titles = {
+    overview: { label: "DASHBOARD", title: "Overview" },
+    addEvent: { label: "EVENTS", title: "Add New Event" },
+    upcoming: { label: "EVENTS", title: "Upcoming Events" },
+    completed: { label: "EVENTS", title: "Completed Events" },
+    gallery: { label: "MEDIA", title: "Gallery Upload" }
+  };
+  
+  const info = titles[sectionKey] || { label: "DASHBOARD", title: "Overview" };
+  document.getElementById("currentPageLabel").textContent = info.label;
+  document.getElementById("currentPageTitle").textContent = info.title;
+}
+
+function navigate(sectionKey, navEl) {
+  showSection(sectionKey);
+  
+  document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+  if (navEl) navEl.classList.add("active");
+}
+
+// =====================================================
+// LOAD EVENTS
+// =====================================================
+async function loadEvents() {
+  try {
+    const res = await fetch(API_EVENTS);
+    if (!res.ok) throw new Error("Failed to fetch");
+    const data = await res.json();
+    state.events = Array.isArray(data) ? data : [];
+    refreshAll();
+  } catch (err) {
+    console.error(err);
+    toast("Failed to load events", "error");
+  }
+}
+
+// =====================================================
+// ADD EVENT
+// =====================================================
+async function addEvent() {
+  const name = document.getElementById("ev_name").value.trim();
+  
+  if (!name) {
+    toast("Event name is required", "error");
+    return;
+  }
+  
+  const payload = {
+    event_name: name,
+    event_type: document.getElementById("eventTypeHidden").value || "other",
+    description: document.getElementById("ev_desc").value,
+    date: document.getElementById("ev_date").value,
+    time: document.getElementById("ev_time").value,
+    venue: document.getElementById("ev_venue").value,
+    team: document.getElementById("ev_team").value,
+    status: document.getElementById("ev_status").value,
+    registration_link: document.getElementById("ev_reg").value,
+    expected_participants: document.getElementById("ev_participants").value
+  };
+
+  try {
+    const res = await fetch(API_EVENTS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!res.ok) throw new Error("Failed to add event");
+    
+    toast("Event added successfully!", "success");
+    document.getElementById("eventForm").reset();
+    clearTypeSelection();
+    clearTeamSelection();
+    document.getElementById("coverPreview").style.display = "none";
+    loadEvents();
+  } catch (err) {
+    console.error(err);
+    toast("Error adding event", "error");
+  }
+}
+
+// =====================================================
+// DELETE EVENT
+// =====================================================
+async function deleteEvent(id) {
+  if (!confirm("Are you sure you want to delete this event?")) return;
+  
+  try {
+    const res = await fetch(`${API_EVENTS}/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete");
+    
+    toast("Event deleted", "info");
+    loadEvents();
+  } catch (err) {
+    console.error(err);
+    toast("Delete failed", "error");
+  }
+}
+
+// =====================================================
+// MARK COMPLETE
+// =====================================================
+async function markCompleted(id) {
+  try {
+    const res = await fetch(`${API_EVENTS}/${id}/complete`, { method: "PUT" });
+    if (!res.ok) throw new Error("Failed to update");
+    
+    toast("Marked as completed!", "success");
+    loadEvents();
+  } catch (err) {
+    console.error(err);
+    toast("Update failed", "error");
+  }
+}
+
+// =====================================================
+// TYPE CHIP SELECTION
+// =====================================================
+function selectType(chip) {
+  document.querySelectorAll("#typeChips .type-chip").forEach(c => {
+    c.classList.remove("selected", "selected-hackathon", "selected-workshop", "selected-seminar", 
+      "selected-competition", "selected-bootcamp", "selected-expo", "selected-talk", "selected-other");
+  });
+  
+  const type = chip.dataset.type;
+  chip.classList.add("selected", `selected-${type}`);
+  document.getElementById("eventTypeHidden").value = type;
+}
+
+function clearTypeSelection() {
+  document.querySelectorAll("#typeChips .type-chip").forEach(c => {
+    c.classList.remove("selected", "selected-hackathon", "selected-workshop", "selected-seminar", 
+      "selected-competition", "selected-bootcamp", "selected-expo", "selected-talk", "selected-other");
+  });
+  document.getElementById("eventTypeHidden").value = "";
+}
+
+// =====================================================
+// TEAM CHIP SELECTION
+// =====================================================
+function selectTeam(chip) {
+  document.querySelectorAll("#teamChips .team-chip").forEach(c => c.classList.remove("selected"));
+  chip.classList.add("selected");
+  document.getElementById("ev_team").value = chip.dataset.team;
+}
+
+function clearTeamSelection() {
+  document.querySelectorAll("#teamChips .team-chip").forEach(c => c.classList.remove("selected"));
+  document.getElementById("ev_team").value = "";
+}
+
+// =====================================================
+// COVER IMAGE PREVIEW
+// =====================================================
+function previewCover(input) {
+  const file = input.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById("coverImg").src = e.target.result;
+      document.getElementById("coverPreview").style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// =====================================================
+// RENDER OVERVIEW
+// =====================================================
+function renderOverview() {
+  const total = state.events.length;
+  const completed = state.events.filter(e => e.status === "past").length;
+  const upcoming = total - completed;
+
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statUpcoming").textContent = upcoming;
+  document.getElementById("statCompleted").textContent = completed;
+  document.getElementById("badgeUpcoming").textContent = upcoming;
+  document.getElementById("badgeCompleted").textContent = completed;
+  document.getElementById("badgeOverview").textContent = total;
+
+  // Upcoming mini cards
+  const upcomingEvents = state.events.filter(e => e.status !== "past").slice(0, 5);
+  const upcomingContainer = document.getElementById("overviewUpcoming");
+  
+  if (upcomingEvents.length === 0) {
+    upcomingContainer.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No upcoming events</p></div>';
+  } else {
+    upcomingContainer.innerHTML = upcomingEvents.map(e => `
+      <div class="event-mini-card">
+        <div class="event-mini-dot dot-upcoming"></div>
+        <div class="event-mini-info">
+          <div class="event-mini-name">${escapeHtml(e.event_name)}</div>
+          <div class="event-mini-meta">
+            <span>📅 ${e.date || "TBD"}</span>
+            <span>📍 ${e.venue || "TBD"}</span>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // Completed mini cards
+  const completedEvents = state.events.filter(e => e.status === "past").slice(0, 5);
+  const completedContainer = document.getElementById("overviewCompleted");
+  
+  if (completedEvents.length === 0) {
+    completedContainer.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No completed events</p></div>';
+  } else {
+    completedContainer.innerHTML = completedEvents.map(e => `
+      <div class="event-mini-card">
+        <div class="event-mini-dot dot-past"></div>
+        <div class="event-mini-info">
+          <div class="event-mini-name">${escapeHtml(e.event_name)}</div>
+          <div class="event-mini-meta">
+            <span>📅 ${e.date || "N/A"}</span>
+            <span>📍 ${e.venue || "N/A"}</span>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+}
+
+// =====================================================
+// RENDER UPCOMING TABLE
+// =====================================================
+function renderUpcomingTable() {
+  const tbody = document.getElementById("upcomingBody");
+  const events = state.events.filter(e => e.status !== "past");
+
+  if (events.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No upcoming events yet</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = events.map(e => `
+    <tr>
+      <td>
+        <div class="event-name-cell">${escapeHtml(e.event_name)}</div>
+        <div class="event-name-sub">${escapeHtml(e.venue || "No venue")}</div>
+      </td>
+      <td><span class="badge badge-${e.event_type || 'other'}">${e.event_type || "other"}</span></td>
+      <td>${escapeHtml(e.team || "—")}</td>
+      <td>${e.date || "TBD"}</td>
+      <td>
+        <div class="btn-row">
+          <button class="btn btn-green btn-sm" onclick="markCompleted(${e.id})">✔ Complete</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id})">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+// =====================================================
+// RENDER COMPLETED TABLE
+// =====================================================
+function renderCompletedTable() {
+  const tbody = document.getElementById("completedBody");
+  const events = state.events.filter(e => e.status === "past");
+
+  if (events.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>No completed events yet</p></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = events.map(e => `
+    <tr>
+      <td>
+        <div class="event-name-cell">${escapeHtml(e.event_name)}</div>
+        <div class="event-name-sub">${escapeHtml(e.venue || "No venue")}</div>
+      </td>
+      <td><span class="badge badge-${e.event_type || 'other'}">${e.event_type || "other"}</span></td>
+      <td>${escapeHtml(e.team || "—")}</td>
+      <td>${e.date || "N/A"}</td>
+      <td><span class="badge badge-past">${e.gallery_count || 0} photos</span></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id})">🗑</button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+// =====================================================
+// RENDER GALLERY EVENTS
+// =====================================================
+function renderGalleryEvents() {
+  const container = document.getElementById("galleryEventList");
+  const events = state.events.filter(e => e.status === "past");
+
+  if (events.length === 0) {
+    container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">📭</div><p>No completed events available</p></div>';
+    return;
+  }
+
+  container.innerHTML = events.map(e => `
+    <div class="gallery-event-card" data-event-id="${e.id}" onclick="selectGalleryEvent(${e.id}, this)">
+      <div class="selected-check">✓</div>
+      <div class="gallery-event-thumb">📷</div>
+      <div class="gallery-event-info">
+        <div class="gallery-event-name">${escapeHtml(e.event_name)}</div>
+        <div class="gallery-event-meta">${e.date || "No date"} • ${e.gallery_count || 0} photos</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+// =====================================================
+// SELECT GALLERY EVENT
+// =====================================================
+function selectGalleryEvent(id, el) {
+  document.querySelectorAll(".gallery-event-card").forEach(c => c.classList.remove("selected"));
+  if (el) el.classList.add("selected");
+  document.getElementById("selectedGalleryEvent").value = id;
+  toast("Event selected", "success");
+}
+
+// =====================================================
+// GALLERY PREVIEW
+// =====================================================
+function previewGallery(input) {
+  const files = input.files;
+  const grid = document.getElementById("galleryPreviewGrid");
+  
+  state.selectedGalleryFiles = Array.from(files);
+  
+  grid.innerHTML = state.selectedGalleryFiles.map((file, index) => {
+    const url = URL.createObjectURL(file);
+    return `
+      <div class="preview-item">
+        <img src="${url}" alt="Preview">
+        <button class="preview-remove" onclick="removeGalleryPreview(${index})">×</button>
+      </div>
+    `;
+  }).join("");
+  
+  document.getElementById("uploadCount").textContent = `${state.selectedGalleryFiles.length} file(s) selected`;
+}
+
+function removeGalleryPreview(index) {
+  state.selectedGalleryFiles.splice(index, 1);
+  
+  const grid = document.getElementById("galleryPreviewGrid");
+  grid.innerHTML = state.selectedGalleryFiles.map((file, i) => {
+    const url = URL.createObjectURL(file);
+    return `
+      <div class="preview-item">
+        <img src="${url}" alt="Preview">
+        <button class="preview-remove" onclick="removeGalleryPreview(${i})">×</button>
+      </div>
+    `;
+  }).join("");
+  
+  document.getElementById("uploadCount").textContent = state.selectedGalleryFiles.length 
+    ? `${state.selectedGalleryFiles.length} file(s) selected` 
+    : "";
+}
+
+function clearGalleryPreview() {
+  state.selectedGalleryFiles = [];
+  document.getElementById("galleryPreviewGrid").innerHTML = "";
+  document.getElementById("gallery_images").value = "";
+  document.getElementById("uploadCount").textContent = "";
+}
+
+// =====================================================
+// UPLOAD GALLERY
+// =====================================================
+async function uploadGallery() {
+  const eventId = document.getElementById("selectedGalleryEvent").value;
+  
+  if (!eventId) {
+    toast("Please select an event first", "error");
+    return;
+  }
+  
+  if (state.selectedGalleryFiles.length === 0) {
+    toast("Please select images to upload", "error");
+    return;
+  }
+
+  const formData = new FormData();
+  state.selectedGalleryFiles.forEach(file => {
+    formData.append("gallery_images", file);
+  });
+
+  const progressEl = document.getElementById("uploadProgress");
+  const progressFill = document.getElementById("progressFill");
+  const progressText = document.getElementById("progressText");
+  
+  progressEl.style.display = "block";
+  progressText.textContent = `Uploading ${state.selectedGalleryFiles.length} file(s)...`;
+  progressFill.style.width = "0%";
+
+  try {
+    const res = await fetch(`${API_UPLOAD}${eventId}`, {
+      method: "POST",
+      body: formData
+    });
+    
+    if (!res.ok) throw new Error("Upload failed");
+    
+    progressFill.style.width = "100%";
+    progressText.textContent = "Upload complete!";
+    
+    toast("Images uploaded successfully!", "success");
+    clearGalleryPreview();
+    loadEvents();
+    
+    setTimeout(() => {
+      progressEl.style.display = "none";
+    }, 2000);
+  } catch (err) {
+    console.error(err);
+    toast("Upload failed", "error");
+    progressEl.style.display = "none";
+  }
+}
+
+// =====================================================
+// UTILITY FUNCTIONS
+// =====================================================
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// =====================================================
+// REFRESH ALL
+// =====================================================
+function refreshAll() {
+  renderOverview();
+  renderUpcomingTable();
+  renderCompletedTable();
+  renderGalleryEvents();
+}
+
+// =====================================================
+// EVENT LISTENERS
+// =====================================================
+document.addEventListener("DOMContentLoaded", function() {
+  // Navigation
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", function() {
+      const section = this.dataset.section;
+      if (section) navigate(section, this);
+    });
+  });
+  
+  // Type chips
+  document.querySelectorAll("#typeChips .type-chip").forEach(chip => {
+    chip.addEventListener("click", function() {
+      selectType(this);
+    });
+  });
+  
+  // Team chips
+  document.querySelectorAll("#teamChips .team-chip").forEach(chip => {
+    chip.addEventListener("click", function() {
+      selectTeam(this);
+    });
+  });
+  
+  // Add event button
+  document.getElementById("addEventBtn").addEventListener("click", addEvent);
+  
+  // Cover image preview
+  document.getElementById("ev_image").addEventListener("change", function() {
+    previewCover(this);
+  });
+  
+  // Gallery images preview
+  document.getElementById("gallery_images").addEventListener("change", function() {
+    previewGallery(this);
+  });
+  
+  // Upload gallery button
+  document.getElementById("uploadGalleryBtn").addEventListener("click", uploadGallery);
+  
+  // Clear gallery button
+  document.getElementById("clearGalleryBtn").addEventListener("click", clearGalleryPreview);
+  
+  // Form reset handler
+  document.getElementById("eventForm").addEventListener("reset", function() {
+    setTimeout(() => {
+      clearTypeSelection();
+      clearTeamSelection();
+      document.getElementById("coverPreview").style.display = "none";
+    }, 0);
+  });
+  
+  // Load events
+  loadEvents();
+  showSection("overview");
+});
+
+// Global function exports for inline onclick handlers
+window.deleteEvent = deleteEvent;
+window.markCompleted = markCompleted;
+window.selectGalleryEvent = selectGalleryEvent;
+window.removeGalleryPreview = removeGalleryPreview;
+</script>
 </body>
 </html>

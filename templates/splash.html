@@ -1,217 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>IIC UIT Shimla</title>
+  <title>IIC UIT Shimla</title>
 
-<!-- FONTS -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <!-- FONTS -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
 
-<!-- THREE JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <style>
+    /* ================= GLOBAL ================= */
+    body {
+      margin: 0;
+      height: 100vh;
+      background: #020617;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-<style>
+    /* ================= SOLID‑LIKE ANIMATED BG (LIQUID GRADIENT) ================= */
+    #bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(
+        circle at 40% 50%,
+        rgba(56, 189, 248, 0.15) 0%,
+        rgba(56, 189, 248, 0.05) 30%,
+        rgba(56, 189, 248, 0.02) 60%,
+        transparent 100%
+      ),
+      radial-gradient(
+        circle at 60% 30%,
+        rgba(34, 197, 94, 0.12) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 20% 70%,
+        rgba(168, 85, 247, 0.1) 0%,
+        transparent 50%
+      ),
+      linear-gradient(145deg, #020617, #030712, #0a0e2d);
+      background-size: 400% 400%;
+      animation: bgDrift 20s linear infinite;
+    }
 
-/* ================= GLOBAL ================= */
+    @keyframes bgDrift {
+      0%, 100% { background-position: 0% 0%; }
+      50%   { background-position: 100% 100%; }
+    }
 
-body{
-margin:0;
-height:100vh;
-background:#020617;
-color:white;
-font-family:'Poppins', sans-serif;
-overflow:hidden;
-display:flex;
-justify-content:center;
-align-items:center;
-}
+    /* ================= SPLASH (neon‑card) ================= */
+    .splash {
+      text-align: center;
+      animation: fadeIn 1.8s ease;
+      position: relative;
+      z-index: 2;
+      max-width: 380px;
+      padding: 45px 25px 35px;
+      background: rgba(2, 10, 23, 0.92);
+      border-radius: 24px;
+      box-shadow:
+        0 0 40px rgba(56, 189, 248, 0.25),
+        0 0 0 1px rgba(56, 189, 248, 0.25);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      backdrop-filter: blur(10px);
+    }
 
-/* ================= PARTICLE BG ================= */
+    /* ================= LOGO (CENTERED, GLOWING) ================= */
+    .logo {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: white;
+      padding: 10px;
+      margin-bottom: 22px;
+      animation: zoom 1.5s ease;
+      box-shadow:
+        0 0 20px rgba(51, 255, 0, 0.6),
+        0 0 0 3px rgba(56, 189, 248, 0.4),
+        0 8px 30px rgba(0, 0, 0, 0.5);
+    }
 
-#bg{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-}
+    /* ================= TITLE (NEON STYLE) ================= */
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 34px;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+      color: #38bdf8;
+      text-shadow:
+        0 0 10px rgba(56, 189, 248, 0.7),
+        0 0 20px rgba(56, 189, 248, 0.5),
+        0 0 30px rgba(56, 189, 248, 0.3);
+      animation: glitch 4s ease infinite alternate;
+    }
 
-/* ================= SPLASH ================= */
+    @keyframes glitch {
+      0% {
+        text-shadow:
+          0 0 10px rgba(56, 189, 248, 0.7),
+          0 0 20px rgba(56, 189, 248, 0.5);
+      }
+      50% {
+        text-shadow:
+          0 0 15px rgba(56, 189, 248, 0.8),
+          0 0 25px rgba(56, 189, 248, 0.6),
+          0 0 35px rgba(56, 189, 248, 0.4);
+      }
+      100% {
+        text-shadow:
+          0 0 10px rgba(56, 189, 248, 0.7),
+          0 0 20px rgba(56, 189, 248, 0.5),
+          -1px -1px 5px rgba(34, 197, 94, 0.6);
+      }
+    }
 
-.splash{
-text-align:center;
-animation:fadeIn 1.5s ease;
+    /* ================= TYPING TEXT ================= */
+    .typing {
+      font-size: 18px;
+      color: #cbd5f5;
+      margin-top: 10px;
+      min-height: 25px;
+    }
 
-}
+    /* ================= LOADER BAR ================= */
+    .loader {
+      width: 240px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 25px auto;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
 
-/* LOGO */
+    .loader-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      animation: load 3s linear forwards;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+    }
 
-.logo{
-width:130px;
-height:130px;
-border-radius:50%;
-background:white;
-padding:10px;
-margin-bottom:20px;
-animation:zoom 1.5s ease;
-}
+    @keyframes load {
+      0% { width: 0; }
+      100% { width: 100%; }
+    }
 
-/* TITLE */
+    /* ================= ANIMATIONS ================= */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-h1{
-font-family:'Orbitron', sans-serif;
-font-size:34px;
-letter-spacing:3px;
-background: linear-gradient(90deg,#38bdf8,#22c55e);
+    @keyframes zoom {
+      0% { transform: scale(0); opacity: 0; }
+      40% { transform: scale(1.1); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
--webkit-background-clip: text; /* for Chrome/Safari */
-background-clip: text;         /* standard property */
+    .fade-out {
+      animation: fadeOut 1s forwards;
+    }
 
--webkit-text-fill-color: transparent;
-}
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
 
-/* TYPING TEXT */
+    /* hint text */
+    #enterText {
+      margin-top: 18px;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.3s;
+      text-shadow: 0 0 4px rgba(148, 163, 184, 0.3);
+    }
 
-.typing{
-font-size:18px;
-color:#cbd5f5;
-margin-top:10px;
-min-height:25px;
-}
-
-/* LOADER BAR */
-
-.loader{
-width:220px;
-height:4px;
-background:rgba(255,255,255,0.1);
-margin:25px auto;
-border-radius:10px;
-overflow:hidden;
-}
-
-.loader-fill{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#38bdf8,#22c55e);
-animation:load 3s linear forwards;
-}
-
-/* ANIMATIONS */
-
-@keyframes load{
-0%{width:0;}
-100%{width:100%;}
-}
-
-@keyframes fadeIn{
-from{opacity:0;}
-to{opacity:1;}
-}
-
-@keyframes zoom{
-from{transform:scale(0.5);}
-to{transform:scale(1);}
-}
-
-.fade-out{
-animation:fadeOut 1s forwards;
-}
-
-@keyframes fadeOut{
-to{opacity:0; visibility:hidden;}
-}
-
-</style>
+    #enterText:hover {
+      color: #38bdf8;
+      transform: translateY(-1px);
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+    }
+  </style>
 </head>
 
 <body>
+  <!-- SOLID‑STYLE ANIMATED GRADIENT BG -->
+  <div id="bg"></div>
 
-<!-- PARTICLE BG -->
-<div id="bg"></div>
+  <!-- SPLASH CONTENT -->
+  <div class="splash" id="splash">
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" class="logo" alt="IIC UIT Shimla">
+    <h1>IIC UIT SHIMLA</h1>
+    <div class="typing" id="typing"></div>
+    <div class="loader">
+      <div class="loader-fill"></div>
+    </div>
+    <p id="enterText">🔊 Tap to Enter UIT World</p>
+  </div>
 
-<!-- SPLASH CONTENT -->
-<div class="splash" id="splash">
+  <!-- AUDIO -->
+  <audio id="welcomeAudio">
+    <source src="{{ url_for('static', filename='audio/download.mp3') }}" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
-<img src="{{ url_for('static', filename='images/logo.jpg') }}" class="logo">
+  <script>
+    /* ================= AUDIO ================= */
+    const audio = document.getElementById("welcomeAudio");
+    const splash = document.getElementById("splash");
 
-<h1>IIC UIT SHIMLA</h1>
+    /* ================= TYPING ================= */
+    const text = "Welcome to UIT World 🚀";
+    let i = 0;
 
-<div class="typing" id="typing"></div>
-
-<div class="loader">
-<div class="loader-fill"></div>
-</div>
-
-<!-- ✅ ADD THIS EXACTLY HERE -->
-<p id="enterText" style="margin-top:15px; color:#94a3b8; cursor:pointer;">
-🔊 Tap to Enter UIT World
-</p>
-
-</div>
-
-<!-- AUDIO -->
-
-
-<audio id="welcomeAudio">
-  <source src="{{ url_for('static', filename='audio/download.mp3') }}" type="audio/mpeg">
-</audio>
-
-<script>
-
-/* ================= AUDIO ================= */
-
-const audio = document.getElementById("welcomeAudio");
-const splash = document.getElementById("splash");
-
-/* ================= TYPING ================= */
-
-const text = "Welcome to UIT World 🚀";
-let i = 0;
-
-function typingEffect(){
-    if(i < text.length){
+    function typingEffect() {
+      if (i < text.length) {
         document.getElementById("typing").innerHTML += text.charAt(i);
         i++;
-        setTimeout(typingEffect,50);
+        setTimeout(typingEffect, 50);
+      }
     }
-}
 
-/* ================= START EXPERIENCE ================= */
+    /* ================= START EXPERIENCE ================= */
+    function startExperience() {
+      // play audio
+      audio.volume = 1;
+      audio.play();
 
-function startExperience(){
+      // start typing AFTER click
+      typingEffect();
 
-    // play audio
-    audio.volume = 1;
-    audio.play();
-
-    // start typing AFTER click
-    typingEffect();
-
-    // redirect after animation
-    setTimeout(() => {
-
+      // redirect after animation
+      setTimeout(() => {
         splash.classList.add("fade-out");
-
         audio.pause();
         audio.currentTime = 0;
+        setTimeout(() => {
+          window.location.href = "/home";
+        }, 1000);
+      }, 4000);
 
-        setTimeout(()=>{
-            window.location.href = "/home";
-        },1000);
+      // remove event after first click
+      document.removeEventListener("click", startExperience);
+    }
 
-    },4000);
-
-    // remove event after first click
-    document.removeEventListener("click", startExperience);
-}
-
-/* wait for user interaction */
-document.addEventListener("click", startExperience);
-
-</script>
+    // wait for user interaction
+    document.addEventListener("click", startExperience);
+  </script>
 </body>
 </html>

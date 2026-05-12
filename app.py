@@ -1,142 +1,29 @@
-# app.py
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import mysql.connector
-from mysql.connector import Error
 import os
-from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
+from dotenv import load_dotenv
+load_dotenv()
+from werkzeug.utils import secure_filename
+import time
 
-# -------------------------
-# App Setup
-# -------------------------
+# ========================= APP SETUP =========================
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.secret_key = "supersecretkey123"
+app.secret_key = os.getenv("SECRET_KEY")  # Change in production
 
-# Upload folder
-UPLOAD_FOLDER = 'static/images'
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
-# -------------------------
-# Database
-# -------------------------
+# ========================= DATABASE CONNECTION =========================
 def get_connection():
-    try:
-        conn = mysql.connector.connect(
-            host='127.0.0.1',
-            user='root',
-            password='Kaularu@1234',  # Replace
-            database='iic_website'
-        )
-        return conn
-    except Error as e:
-        print("DB Connection Error:", e)
-        return None
-
-# -------------------------
-# Tables creation
-# -------------------------
-def create_tables():
-    conn = get_connection()
-    cursor = conn.cursor()
-    # Admin
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS admin_users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50) UNIQUE,
-        password VARCHAR(100)
+    return mysql.connector.connect(
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
     )
-    """)
-    # Faculty
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS faculty_coordinators (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        full_name VARCHAR(100),
-        branch VARCHAR(50),
-        email VARCHAR(100),
-        password VARCHAR(100),
-        photo VARCHAR(255)
-    )
-    """)
-    # Student
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS student_coordinators (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        full_name VARCHAR(100),
-        branch VARCHAR(50),
-        year INT,
-        email VARCHAR(100),
-        password VARCHAR(100),
-        photo VARCHAR(255)
-    )
-    """)
-    # Teams
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS teams (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        team_name VARCHAR(100),
-        description VARCHAR(255)
-    )
-    """)
-    # Members
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS team_members (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        full_name VARCHAR(100),
-        branch VARCHAR(50),
-        year INT,
-        role VARCHAR(50),
-        email VARCHAR(100),
-        photo VARCHAR(255),
-        team_id INT,
-        FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
-    )
-    """)
-    # Events
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS events (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        event_name VARCHAR(100),
-        description TEXT,
-        date DATE
-    )
-    """)
-    # Registrations
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS event_registrations (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        event_id INT,
-        student_id INT,
-        registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (event_id) REFERENCES events(id),
-        FOREIGN KEY (student_id) REFERENCES student_coordinators(id)
-    )
-    """)
-    # Default Admin
-    cursor.execute("""
-    INSERT IGNORE INTO admin_users (username, password) VALUES ('admin','admin123')
-    """)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-create_tables()
-
-# -------------------------
-# Helpers
-# -------------------------
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.',1)[1].lower() in ALLOWED_EXTENSIONS
-
-def save_file(file):
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-        return filepath
-    return ""
-
 def fetch_all(query, params=None):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -154,128 +41,283 @@ def execute_query(query, params=None):
     cursor.close()
     conn.close()
 
+# ========================= CREATE TABLES & DEFAULT ADMIN =========================
+def create_tables():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Admin Users Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin_users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role VARCHAR(20) DEFAULT 'admin'
+    )
+    """)
+
+    # Events Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS events (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        event_name VARCHAR(100) NOT NULL,
+        description TEXT,
+        date DATE,
+        image VARCHAR(255)
+    )
+    """)
+
+    # Gallery Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS gallery (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(100),
+        image VARCHAR(255) NOT NULL
+    )
+    """)
+
+    # ✅ DEFAULT ADMIN
+    default_user = os.getenv("ADMIN_DEFAULT_USERNAME", "admin")
+    default_pass = os.getenv("ADMIN_DEFAULT_PASSWORD", "admin123")
+
+    cursor.execute("SELECT * FROM admin_users WHERE username = %s", (default_user,))
+    if not cursor.fetchone():
+        hashed = generate_password_hash(default_pass)
+        cursor.execute(
+            "INSERT INTO admin_users (username, password, role) VALUES (%s, %s, %s)",
+            (default_user, hashed, "admin")
+        )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+# ========================= ADMIN REQUIRED DECORATOR =========================
 def admin_required(f):
-    from functools import wraps
     @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'admin_logged_in' in session:
-            return f(*args, **kwargs)
-        flash("Admin login required!", "danger")
-        return redirect(url_for('admin_login'))
-    return wrap
+    def wrapper(*args, **kwargs):
+        if not session.get("admin_logged_in"):
+            return redirect(url_for("admin_login_page"))
+        return f(*args, **kwargs)
+    return wrapper
 
-def faculty_required(f):
-    from functools import wraps
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'faculty_logged_in' in session:
-            return f(*args, **kwargs)
-        flash("Faculty login required!", "danger")
-        return redirect(url_for('faculty_login'))
-    return wrap
-
-def student_required(f):
-    from functools import wraps
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'student_logged_in' in session:
-            return f(*args, **kwargs)
-        flash("Student login required!", "danger")
-        return redirect(url_for('student_login'))
-    return wrap
-
-# -------------------------
-# HTML Routes
-# -------------------------
+# ========================= FRONTEND ROUTES =========================
 @app.route("/")
-def splash():
-    return render_template("splash.html")
-
-# HOME PAGE
-@app.route("/home")
 def home():
     return render_template("home.html")
 
-# Admin
-@app.route('/admin/login', methods=['GET','POST'])
+@app.route("/events")
+def events_page():
+    return render_template("events.html")
+
+@app.route("/gallery")
+def gallery_page():
+    return render_template("gallery.html")
+
+@app.route("/council")
+def council():
+    return render_template("council.html")
+
+# ========================= ADMIN LOGIN ROUTES =========================
+
+# 1. Admin Login Page (Shows the form)
+@app.route("/admin-login-page")
+def admin_login_page():
+    if session.get("admin_logged_in"):
+        return redirect(url_for("admin_dashboard"))
+    return render_template("admin-login.html")
+
+# 2. Admin Login Processing (Only POST)
+@app.route('/admin-login', methods=['POST'])
 def admin_login():
-    if request.method=='POST':
-        user = request.form['username']
-        pwd = request.form['password']
-        res = fetch_all("SELECT * FROM admin_users WHERE username=%s AND password=%s",(user,pwd))
-        if res:
-            session['admin_logged_in']=True
-            session['admin_user']=user
-            return redirect(url_for('admin_dashboard'))
-        else: flash("Invalid credentials","danger")
-    return render_template('admin-login.html')
+    try:
+        data = request.get_json()
+        username = data.get('user')
+        password = data.get('pass')
 
-@app.route('/admin/logout')
-def admin_logout(): session.clear(); return redirect(url_for('admin_login'))
+        if not username or not password:
+            return jsonify({"success": False, "message": "Username and password are required"}), 400
 
-@app.route('/admin/dashboard')
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM admin_users WHERE username = %s", (username,))
+        admin_user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if admin_user and check_password_hash(admin_user['password'], password):
+            session["admin_logged_in"] = True
+            session["role"] = admin_user.get("role", "admin")
+            return jsonify({
+                "success": True,
+                "redirect": "/admin/dashboard"
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": "Invalid username or password"
+            })
+
+    except Exception as e:
+        print("Login Error:", e)
+        return jsonify({"success": False, "message": "Internal server error"}), 500
+
+# Admin Dashboard (Protected)
+@app.route("/admin/dashboard")
 @admin_required
-def admin_dashboard(): return render_template('admin-dashboard.html')
+def admin_dashboard():
+    return render_template("admin-dashboard.html")
 
-@app.route('/faculty-login')
-def faculty_login(): return render_template('faculty-login.html')
-@app.route('/faculty/dashboard')
-@faculty_required
-def faculty_dashboard(): return render_template('faculty-dashboard.html')
+# Logout
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("home"))
 
-@app.route('/student-coordinator/login')
-def student_login(): return render_template('student-coordinator-login.html')
-@app.route('/student-coordinator/dashboard')
-@student_required
-def student_dashboard(): return render_template('student-coordinator-dashboard.html')
+# ========================= API ROUTES =========================
 
-@app.route('/events')
-def events_page(): return render_template('events.html')
+# Get Events (for side panel)
+@app.route("/api/events", methods=["GET"])
+def get_events():
+    events = fetch_all("SELECT * FROM events ORDER BY date DESC")
+    return jsonify(events)
 
-# -------------------------
-# Password Reset Routes
-# -------------------------
-@app.route('/reset-password', methods=['GET','POST'])
-def reset_password():
-    if request.method=='POST':
-        email = request.form['email']
-        new_pwd = request.form['new_password']
-        # Check Admin
-        res = fetch_all("SELECT * FROM admin_users WHERE username=%s",(email,))
-        if res: execute_query("UPDATE admin_users SET password=%s WHERE username=%s",(new_pwd,email))
-        # Check Faculty
-        elif fetch_all("SELECT * FROM faculty_coordinators WHERE email=%s",(email,)):
-            execute_query("UPDATE faculty_coordinators SET password=%s WHERE email=%s",(new_pwd,email))
-        # Check Student
-        elif fetch_all("SELECT * FROM student_coordinators WHERE email=%s",(email,)):
-            execute_query("UPDATE student_coordinators SET password=%s WHERE email=%s",(new_pwd,email))
-        else: flash("Email not found!","danger"); return redirect(url_for('reset_password'))
-        flash("Password updated successfully!","success")
-        return redirect(url_for('home'))
-    return render_template('reset-password.html')
-
-# -------------------------
-# API Routes with File Upload & CRUD
-# -------------------------
-# Example: Add Faculty
-@app.route('/api/faculty', methods=['POST'])
+# Add Event (Admin only)
+@app.route('/api/events', methods=['POST'])
 @admin_required
-def api_add_faculty():
-    data = request.form
-    file = request.files.get('photo')
-    path = save_file(file)
+def add_event():
+    try:
+        data = request.get_json()
+
+        event_name = data.get('event_name')
+        description = data.get('description')
+        date = data.get('date')
+        time = data.get('time')
+        venue = data.get('venue')
+        team = data.get('team')
+        status = data.get('status', 'upcoming')
+
+        if not event_name or not date:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = """
+            INSERT INTO events (event_name, description, date, time, venue, team, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+
+        cursor.execute(query, (event_name, description, date, time, venue, team, status))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"message": "Event added successfully"}), 201
+
+    except Exception as e:
+        print("ERROR:", str(e))  # 🔥 IMPORTANT
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/events/<int:event_id>", methods=["DELETE"])
+@admin_required
+def delete_event(event_id):
+    execute_query("DELETE FROM events WHERE id=%s", (event_id,))
+    return jsonify({"message": "Deleted"})
+
+@app.route("/api/events/<int:event_id>/complete", methods=["PUT"])
+@admin_required
+def mark_completed(event_id):
     execute_query(
-        "INSERT INTO faculty_coordinators (full_name, branch, email, password, photo) VALUES (%s,%s,%s,%s,%s)",
-        (data['full_name'], data['branch'], data['email'], data['password'], path)
+        "UPDATE events SET status='past' WHERE id=%s",
+        (event_id,)
     )
-    return jsonify({"message":"Faculty added successfully","photo":path})
+    return jsonify({"message": "Marked completed"})
 
-# Similarly, you can replicate API routes for:
-# Teams, Students, Members, Events, Registrations
-# With GET/POST/PUT/DELETE and admin/faculty/student permissions
 
-# -------------------------
-# Run App
-# -------------------------
-if __name__ == '__main__':
-    app.run(debug=True)
+# Gallery APIs
+@app.route("/api/gallery", methods=["GET"])
+def get_gallery():
+    gallery = fetch_all("SELECT * FROM gallery ORDER BY id DESC")
+    return jsonify(gallery)
+
+@app.route("/api/gallery", methods=["POST"])
+@admin_required
+def add_gallery():
+    try:
+        title = request.form.get("title", "Untitled")
+        file = request.files.get("image")
+
+        if not file or not file.filename:
+            return jsonify({"success": False, "message": "No image uploaded"}), 400
+
+        filename = file.filename
+        file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        execute_query(
+            "INSERT INTO gallery (title, image) VALUES (%s, %s)",
+            (title, filename)
+        )
+        return jsonify({"success": True, "message": "Image added to gallery"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    
+@app.route("/api/event-gallery/<int:event_id>", methods=["POST"])
+@admin_required
+def upload_event_gallery(event_id):
+    files = request.files.getlist("gallery_images")
+
+    for file in files:
+     if file and file.filename:
+              filename = secure_filename(file.filename)
+              filename = f"{event_id}_{int(time.time())}_{filename}"
+              file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+     execute_query(
+            "INSERT INTO event_gallery (event_id, image) VALUES (%s, %s)",
+            (event_id, filename)
+        )
+
+           
+
+            
+
+    return jsonify({"success": True})
+
+@app.route("/api/event-gallery/<int:event_id>", methods=["GET"])
+def get_event_gallery(event_id):
+    images = fetch_all(
+        "SELECT image FROM event_gallery WHERE event_id=%s",
+        (event_id,)
+    )
+    return jsonify(images)
+
+
+
+@app.route("/api/gallery/completed")
+def completed_gallery():
+    data = fetch_all("""
+        SELECT e.id, e.event_name, e.date, g.image
+        FROM events e
+        JOIN event_gallery g ON e.id = g.event_id
+        WHERE e.status = 'past'
+        ORDER BY e.date DESC
+    """)
+    return jsonify(data)
+
+@app.route("/api/completed-events", methods=["GET"])
+def get_completed_events():
+    events = fetch_all("""
+        SELECT id, event_name 
+        FROM events 
+        WHERE status = 'past'
+        ORDER BY date DESC
+    """)
+    return jsonify(events)
+
+        
+
+# ========================= RUN THE APP =========================
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
