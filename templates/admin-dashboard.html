@@ -1240,61 +1240,65 @@ function navigate(sectionKey, navEl) {
 // =====================================================
 // LOAD EVENTS
 // =====================================================
-async function loadEvents() {
-  try {
-    const res = await fetch(API_EVENTS);
-    if (!res.ok) throw new Error("Failed to fetch");
-    const data = await res.json();
-    state.events = Array.isArray(data) ? data : [];
-    refreshAll();
-  } catch (err) {
-    console.error(err);
-    toast("Failed to load events", "error");
-  }
-}
-
-// =====================================================
-// ADD EVENT
-// =====================================================
 async function addEvent() {
+
   const name = document.getElementById("ev_name").value.trim();
-  
+
   if (!name) {
     toast("Event name is required", "error");
     return;
   }
-  
-  const payload = {
-    event_name: name,
-    event_type: document.getElementById("eventTypeHidden").value || "other",
-    description: document.getElementById("ev_desc").value,
-    date: document.getElementById("ev_date").value,
-    time: document.getElementById("ev_time").value,
-    venue: document.getElementById("ev_venue").value,
-    team: document.getElementById("ev_team").value,
-    status: document.getElementById("ev_status").value,
-    registration_link: document.getElementById("ev_reg").value,
-    expected_participants: document.getElementById("ev_participants").value
-  };
+
+  // Create FormData
+  const formData = new FormData();
+
+  formData.append("event_name", name);
+  formData.append("event_type", document.getElementById("eventTypeHidden").value || "other");
+  formData.append("description", document.getElementById("ev_desc").value);
+  formData.append("date", document.getElementById("ev_date").value);
+  formData.append("time", document.getElementById("ev_time").value);
+  formData.append("venue", document.getElementById("ev_venue").value);
+  formData.append("team", document.getElementById("ev_team").value);
+  formData.append("status", document.getElementById("ev_status").value);
+  formData.append("registration_link", document.getElementById("ev_reg").value);
+  formData.append("expected_participants", document.getElementById("ev_participants").value);
+
+  // IMAGE FILE
+  const imageInput = document.getElementById("ev_image");
+
+  if (imageInput.files.length > 0) {
+    formData.append("image", imageInput.files[0]);
+  }
 
   try {
+
     const res = await fetch(API_EVENTS, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: formData
     });
-    
-    if (!res.ok) throw new Error("Failed to add event");
-    
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to add event");
+    }
+
     toast("Event added successfully!", "success");
+
     document.getElementById("eventForm").reset();
+
     clearTypeSelection();
     clearTeamSelection();
+
     document.getElementById("coverPreview").style.display = "none";
+
     loadEvents();
+
   } catch (err) {
+
     console.error(err);
-    toast("Error adding event", "error");
+
+    toast(err.message || "Error adding event", "error");
   }
 }
 
