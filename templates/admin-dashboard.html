@@ -1240,6 +1240,18 @@ function navigate(sectionKey, navEl) {
 // =====================================================
 // LOAD EVENTS
 // =====================================================
+ async function loadEvents() {
+  try {
+    const res = await fetch(API_EVENTS);
+    if (!res.ok) throw new Error("Failed to fetch");
+    const data = await res.json();
+    state.events = Array.isArray(data) ? data : [];
+    refreshAll();
+  } catch (err) {
+    console.error(err);
+    toast("Failed to load events", "error");
+  }
+}
 async function addEvent() {
 
   const name = document.getElementById("ev_name").value.trim();
